@@ -5,9 +5,13 @@ namespace App\Models\Blog;
 use App\Enums\PostType;
 use App\Enums\PublicationStatus;
 use App\Models\Media\Media;
+use App\Models\Pages\PageSectionItem;
+use App\Models\Seo\SeoMetadata;
 use App\Models\User;
+use App\Support\Concerns\FeaturableInSections;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use App\Support\Concerns\SearchableTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -87,6 +91,10 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Post withoutTrashed()
  *
+ * @property-read Collection<int, PageSectionItem> $sectionFeatures
+ * @property-read int|null $section_features_count
+ * @property-read SeoMetadata|null $seo
+ *
  * @mixin \Eloquent
  */
 #[Table('posts')]
@@ -97,7 +105,7 @@ use Illuminate\Support\Carbon;
 class Post extends Model implements TranslatableContract
 {
     /** @use HasFactory<PostFactory> */
-    use HasFactory, HasMediaAttachments, HasPublicationStatus, SearchableTranslations, SoftDeletes, Translatable;
+    use FeaturableInSections, HasFactory, HasMediaAttachments, HasPublicationStatus, HasSeo, SearchableTranslations, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

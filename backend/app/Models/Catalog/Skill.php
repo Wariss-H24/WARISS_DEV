@@ -2,6 +2,8 @@
 
 namespace App\Models\Catalog;
 
+use App\Models\Pages\PageSectionItem;
+use App\Support\Concerns\FeaturableInSections;
 use App\Support\Concerns\OrderedByPosition;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -67,6 +69,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Skill whereYearsOfExperience($value)
  * @method static Builder<static>|Skill withTranslation(?string $locale = null)
  *
+ * @property-read Collection<int, PageSectionItem> $sectionFeatures
+ * @property-read int|null $section_features_count
+ *
  * @mixin \Eloquent
  */
 #[Table('skills')]
@@ -74,7 +79,7 @@ use Illuminate\Support\Carbon;
 class Skill extends Model implements TranslatableContract
 {
     /** @use HasFactory<SkillFactory> */
-    use HasFactory, OrderedByPosition, Translatable;
+    use FeaturableInSections, HasFactory, OrderedByPosition, Translatable;
 
     /**
      * @var list<string>

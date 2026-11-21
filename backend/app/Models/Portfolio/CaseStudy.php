@@ -5,8 +5,10 @@ namespace App\Models\Portfolio;
 use App\Enums\PublicationStatus;
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Models\Seo\SeoMetadata;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use App\Support\Concerns\OrderedByPosition;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -87,6 +89,8 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CaseStudy withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|CaseStudy withoutTrashed()
  *
+ * @property-read SeoMetadata|null $seo
+ *
  * @mixin \Eloquent
  */
 #[Table('case_studies')]
@@ -97,7 +101,7 @@ use Illuminate\Support\Carbon;
 class CaseStudy extends Model implements TranslatableContract
 {
     /** @use HasFactory<CaseStudyFactory> */
-    use HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SoftDeletes, Translatable;
+    use HasFactory, HasMediaAttachments, HasPublicationStatus, HasSeo, OrderedByPosition, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

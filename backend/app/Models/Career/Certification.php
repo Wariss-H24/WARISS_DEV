@@ -4,7 +4,9 @@ namespace App\Models\Career;
 
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Models\Pages\PageSectionItem;
 use App\Support\Concerns\AppearsInTimeline;
+use App\Support\Concerns\FeaturableInSections;
 use App\Support\Concerns\OrderedByPosition;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -75,6 +77,8 @@ use Illuminate\Support\Carbon;
  *
  * @property-read Collection<int, TimelineEvent> $timelineEvents
  * @property-read int|null $timeline_events_count
+ * @property-read Collection<int, PageSectionItem> $sectionFeatures
+ * @property-read int|null $section_features_count
  *
  * @mixin \Eloquent
  */
@@ -86,7 +90,7 @@ use Illuminate\Support\Carbon;
 class Certification extends Model implements TranslatableContract
 {
     /** @use HasFactory<CertificationFactory> */
-    use AppearsInTimeline, HasFactory, OrderedByPosition, Translatable;
+    use AppearsInTimeline, FeaturableInSections, HasFactory, OrderedByPosition, Translatable;
 
     /**
      * @var list<string>

@@ -9,9 +9,13 @@ use App\Models\Career\TimelineEvent;
 use App\Models\Catalog\Skill;
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Models\Pages\PageSectionItem;
+use App\Models\Seo\SeoMetadata;
 use App\Support\Concerns\AppearsInTimeline;
+use App\Support\Concerns\FeaturableInSections;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use App\Support\Concerns\OrderedByPosition;
 use App\Support\Concerns\SearchableTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -114,6 +118,9 @@ use Illuminate\Support\Carbon;
  * @property-read int|null $case_studies_count
  * @property-read Collection<int, TimelineEvent> $timelineEvents
  * @property-read int|null $timeline_events_count
+ * @property-read Collection<int, PageSectionItem> $sectionFeatures
+ * @property-read int|null $section_features_count
+ * @property-read SeoMetadata|null $seo
  *
  * @mixin \Eloquent
  */
@@ -126,7 +133,7 @@ use Illuminate\Support\Carbon;
 class Project extends Model implements TranslatableContract
 {
     /** @use HasFactory<ProjectFactory> */
-    use AppearsInTimeline, HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
+    use AppearsInTimeline, FeaturableInSections, HasFactory, HasMediaAttachments, HasPublicationStatus, HasSeo, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

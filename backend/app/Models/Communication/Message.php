@@ -2,6 +2,7 @@
 
 namespace App\Models\Communication;
 
+use App\Casts\AsJsonObject;
 use App\Enums\MessageStatus;
 use App\Enums\MessageType;
 use App\Models\Services\Service;
@@ -116,22 +117,6 @@ class Message extends Model
     }
 
     /**
-     * Précisions d'une demande (budget, délai…), toujours stockées comme objet JSON.
-     *
-     * Un tableau PHP vide serait encodé en liste « [] » et refusé par messages_details_check :
-     * il est enregistré comme objet vide « {} ».
-     *
-     * @return Attribute<array<string, mixed>, array<string, mixed>>
-     */
-    protected function details(): Attribute
-    {
-        return Attribute::make(
-            get: fn (?string $value): array => $value === null ? [] : (array) json_decode($value, true),
-            set: fn (array $value): string => $value === [] ? '{}' : (string) json_encode($value),
-        );
-    }
-
-    /**
      * Adresse e-mail normalisée (minuscules, sans espaces).
      *
      * @return Attribute<string, string>
@@ -150,6 +135,7 @@ class Message extends Model
     {
         return [
             'type' => MessageType::class,
+            'details' => AsJsonObject::class,
             'consent_given' => 'boolean',
             'consented_at' => 'datetime',
             'status' => MessageStatus::class,

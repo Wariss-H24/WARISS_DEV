@@ -4,6 +4,8 @@ namespace App\Support\Concerns;
 
 use App\Enums\MediableRole;
 use App\Models\Media\Media;
+use App\Models\Media\Mediable;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 /**
@@ -11,9 +13,28 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
  *
  * Les images uniques (couverture, logo…) sont des clés étrangères directes ; ce trait ne gère
  * que les rattachements multiples. Le modèle doit figurer dans la morph map.
+ * À la suppression définitive du contenu, ses rattachements sont retirés : sinon, les médias
+ * resteraient « utilisés » (RESTRICT) et ne pourraient plus jamais être supprimés.
  */
 trait HasMediaAttachments
 {
+    /**
+     * Retire les rattachements de médias à la suppression définitive du contenu.
+     */
+    protected static function bootHasMediaAttachments(): void
+    {
+        static::deleted(function (Model $content): void {
+            if (method_exists($content, 'isForceDeleting') && ! $content->isForceDeleting()) {
+                return;
+            }
+
+            Mediable::query()
+                ->where('mediable_type', $content->getMorphClass())
+                ->where('mediable_id', $content->getKey())
+                ->delete();
+        });
+    }
+
     /**
      * Tous les médias rattachés, dans l'ordre choisi.
      *

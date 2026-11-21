@@ -147,8 +147,8 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 ## D16 — Administration, sécurité et SEO
 
 - `activity_logs` — `user_id?→users` (SET NULL), `event` (login, logout, created, updated, published, unpublished, deleted, settings\_changed, password\_reset), `subject_type?`, `subject_id?`, `description?`, `properties` (jsonb : noms des champs modifiés, jamais de mots de passe ni de secrets), `ip_address?` (inet), `user_agent?`. Seulement `created_at`. Conservation : 12 mois.
-- `seo_metadata` — `seoable_type`, `seoable_id` (unique ensemble), `robots_index` (bool, vrai), `robots_follow` (bool, vrai), `canonical_url?`, `og_image_media_id?→media` (SET NULL), `schema_type?`, `structured_data?` (jsonb). Traductions : `meta_title?`, `meta_description?`, `og_title?`, `og_description?`. Rattaché aux pages, services, projets, études de cas, expérimentations et articles.
-- `redirects` — `from_path` (unique), `to_path`, `status_code` (CHECK : 301, 302, 307, 308), `is_active`, `hits` (int), `created_by?→users` (SET NULL). Le sitemap et le `robots.txt` sont générés, pas stockés.
+- `seo_metadata` — `seoable_type`, `seoable_id` (unique ensemble), `robots_index` (bool, vrai), `robots_follow` (bool, vrai), `canonical_url?`, `og_image_media_id?→media` (SET NULL), `schema_type?`, `structured_data?` (jsonb). Traductions : `meta_title?`, `meta_description?`, `og_title?`, `og_description?`. Rattaché aux pages, services, projets, études de cas, expérimentations et articles (CHECK sur `seoable_type`) ; supprimé avec le contenu lors d'une suppression définitive (D-18). `canonical_url` limitée à https.
+- `redirects` — `from_path` (unique), `to_path`, `status_code` (CHECK : 301, 302, 307, 308), `is_active`, `hits` (int), `created_by?→users` (SET NULL). Le sitemap et le `robots.txt` sont générés, pas stockés. CHECK : `from_path` est un chemin interne (`/…`, jamais `//domaine`), `to_path` un chemin interne ou une URL https, différent de `from_path` (D-18).
 
 ## D17 — Analytics
 

@@ -4,7 +4,9 @@ namespace App\Models\Pages;
 
 use App\Enums\PageKind;
 use App\Enums\PublicationStatus;
+use App\Models\Seo\SeoMetadata;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
 use Database\Factories\Pages\PageFactory;
@@ -68,6 +70,8 @@ use LogicException;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Page withoutTrashed()
  *
+ * @property-read SeoMetadata|null $seo
+ *
  * @mixin \Eloquent
  */
 #[Table('pages')]
@@ -75,7 +79,7 @@ use LogicException;
 class Page extends Model implements TranslatableContract
 {
     /** @use HasFactory<PageFactory> */
-    use HasFactory, HasPublicationStatus, SoftDeletes, Translatable;
+    use HasFactory, HasPublicationStatus, HasSeo, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

@@ -6,8 +6,12 @@ use App\Enums\PricingModel;
 use App\Enums\PublicationStatus;
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Models\Pages\PageSectionItem;
+use App\Models\Seo\SeoMetadata;
+use App\Support\Concerns\FeaturableInSections;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use App\Support\Concerns\OrderedByPosition;
 use App\Support\Concerns\SearchableTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -97,6 +101,10 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Service withoutTrashed()
  *
+ * @property-read Collection<int, PageSectionItem> $sectionFeatures
+ * @property-read int|null $section_features_count
+ * @property-read SeoMetadata|null $seo
+ *
  * @mixin \Eloquent
  */
 #[Table('services')]
@@ -107,7 +115,7 @@ use Illuminate\Support\Carbon;
 class Service extends Model implements TranslatableContract
 {
     /** @use HasFactory<ServiceFactory> */
-    use HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
+    use FeaturableInSections, HasFactory, HasMediaAttachments, HasPublicationStatus, HasSeo, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

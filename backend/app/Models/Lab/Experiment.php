@@ -6,8 +6,10 @@ use App\Enums\ExperimentKind;
 use App\Enums\PublicationStatus;
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Models\Seo\SeoMetadata;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
+use App\Support\Concerns\HasSeo;
 use App\Support\Concerns\OrderedByPosition;
 use App\Support\Concerns\SearchableTranslations;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
@@ -95,6 +97,8 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Experiment withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Experiment withoutTrashed()
  *
+ * @property-read SeoMetadata|null $seo
+ *
  * @mixin \Eloquent
  */
 #[Table('experiments')]
@@ -105,7 +109,7 @@ use Illuminate\Support\Carbon;
 class Experiment extends Model implements TranslatableContract
 {
     /** @use HasFactory<ExperimentFactory> */
-    use HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
+    use HasFactory, HasMediaAttachments, HasPublicationStatus, HasSeo, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
 
     /**
      * @var list<string>
