@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Blog\Post;
+use App\Models\Career\Achievement;
+use App\Models\Career\Certification;
 use App\Models\Career\Education;
 use App\Models\Career\Experience;
 use App\Models\Catalog\Skill;
@@ -70,6 +72,8 @@ class AppServiceProvider extends ServiceProvider
             'post' => Post::class,
             'experience' => Experience::class,
             'education' => Education::class,
+            'certification' => Certification::class,
+            'achievement' => Achievement::class,
         ]);
     }
 
