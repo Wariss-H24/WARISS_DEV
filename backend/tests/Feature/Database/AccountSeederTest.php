@@ -35,17 +35,33 @@ it('keeps the existing password when it runs a second time', function () {
         ->and(Hash::check('admin-password-123', $admin->password))->toBeTrue();
 });
 
-it('generates a password outside production when none is configured', function () {
-    config(['wariss.seed_accounts.viewer.password' => null]);
+it('generates a non-empty password outside production when none is configured', function (?string $configuredPassword) {
+    config(['wariss.seed_accounts.viewer.password' => $configuredPassword]);
 
     $this->seed(AccountSeeder::class);
 
-    expect(User::where('email', 'viewer@wariss.test')->exists())->toBeTrue();
-});
+    $viewer = User::where('email', 'viewer@wariss.test')->sole();
+    expect(Hash::check('', $viewer->password))->toBeFalse();
+})->with([
+    'variable absente' => [null],
+    'variable vide dans le .env' => [''],
+]);
 
-it('refuses to create an account without a configured password in production', function () {
-    config(['wariss.seed_accounts.admin.password' => null]);
+it('refuses to create an account without a configured password in production', function (?string $configuredPassword) {
+    config(['wariss.seed_accounts.admin.password' => $configuredPassword]);
     $this->app['env'] = 'production';
 
     $this->app->make(AccountSeeder::class)->run();
-})->throws(RuntimeException::class, 'SEED_ADMIN_PASSWORD');
+})->with([
+    'variable absente' => [null],
+    'variable vide dans le .env' => [''],
+])->throws(RuntimeException::class, 'SEED_ADMIN_PASSWORD');
+
+it('does not create an account whose email is not configured', function () {
+    config(['wariss.seed_accounts.viewer.email' => '']);
+
+    $this->seed(AccountSeeder::class);
+
+    expect(User::count())->toBe(1)
+        ->and(User::sole()->role)->toBe(UserRole::Admin);
+});

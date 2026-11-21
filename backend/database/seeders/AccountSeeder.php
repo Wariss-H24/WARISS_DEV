@@ -20,7 +20,7 @@ class AccountSeeder extends Seeder
      */
     public function run(): void
     {
-        /** @var array<string, array{name: string, email: string, password: ?string}> $accounts */
+        /** @var array<string, array{name: string, email: ?string, password: ?string}> $accounts */
         $accounts = config('wariss.seed_accounts');
 
         foreach ($accounts as $role => $account) {
@@ -29,10 +29,16 @@ class AccountSeeder extends Seeder
     }
 
     /**
-     * @param  array{name: string, email: string, password: ?string}  $account
+     * @param  array{name: string, email: ?string, password: ?string}  $account
      */
     private function seedAccount(UserRole $role, array $account): void
     {
+        if (blank($account['email'])) {
+            $this->command?->warn('SEED_'.strtoupper($role->value)."_EMAIL n'est pas défini : compte {$role->value} non créé.");
+
+            return;
+        }
+
         $email = mb_strtolower(trim($account['email']));
 
         if (User::where('email', $email)->exists()) {
@@ -41,7 +47,7 @@ class AccountSeeder extends Seeder
             return;
         }
 
-        $password = $account['password'] ?? $this->generatePassword($role);
+        $password = filled($account['password']) ? $account['password'] : $this->generatePassword($role);
 
         $user = new User([
             'name' => $account['name'],

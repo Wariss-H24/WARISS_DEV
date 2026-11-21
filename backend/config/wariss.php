@@ -10,18 +10,21 @@ return [
 
     /*
     | Comptes d'administration créés par le seeder (décision D-04).
-    | Les mots de passe ne sont jamais écrits dans le code : ils viennent du .env.
-    | En local, un mot de passe absent est généré et affiché une seule fois.
+    |
+    | Aucune donnée personnelle ni aucun mot de passe dans le code : tout vient
+    | du .env, qui n'est jamais versionné. Un compte sans e-mail n'est pas créé.
+    | Mot de passe vide : généré et affiché une seule fois (local), refusé en production.
+    | Pour changer un mot de passe ensuite : php artisan app:set-password {email}
     */
     'seed_accounts' => [
         'admin' => [
             'name' => env('SEED_ADMIN_NAME', 'Administrateur'),
-            'email' => env('SEED_ADMIN_EMAIL', 'admin@wariss.test'),
+            'email' => env('SEED_ADMIN_EMAIL'),
             'password' => env('SEED_ADMIN_PASSWORD'),
         ],
         'viewer' => [
             'name' => env('SEED_VIEWER_NAME', 'Lecteur'),
-            'email' => env('SEED_VIEWER_EMAIL', 'viewer@wariss.test'),
+            'email' => env('SEED_VIEWER_EMAIL'),
             'password' => env('SEED_VIEWER_PASSWORD'),
         ],
     ],

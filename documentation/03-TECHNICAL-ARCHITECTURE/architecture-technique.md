@@ -373,6 +373,7 @@ Conséquences en développement sous Windows :
 - **Horizon ne fonctionne pas sous Windows** : il exige l'extension `pcntl`, qui n'existe pas sur cette plateforme. En local, les files tournent avec `php artisan queue:listen` (lancé par `composer dev`) ; Horizon sera installé à l'étape du déploiement, pour la production Linux seulement.
 - **Redis** : client `predis/predis` (pur PHP, sans extension). En local, **cache, files et sessions utilisent le pilote `database`** (PostgreSQL), car Docker n'est pas accessible ; la production utilise Redis. Le code ne doit donc jamais dépendre d'une fonction propre à Redis : seulement des façades `Cache`, `Queue` et `Session` de Laravel. Les tests tournent avec les pilotes `array` et `sync`.
 - **Images** : `imagick` absente, Intervention Image utilise le pilote **GD** (présent).
+- **Base de données** : en local, l'application se connecte avec le compte `postgres` (super-utilisateur), car le poste ne permet pas de créer un rôle dédié. **En production, un rôle dédié non super-utilisateur, propriétaire de la base, est obligatoire.** Le code ne doit donc jamais dépendre de droits super-utilisateur : l'extension `unaccent` est « trusted » et peut être créée par le propriétaire de la base.
 - **PowerShell** est bloqué par une stratégie de groupe sur ce poste : les scripts du projet sont écrits pour Bash (Git Bash) ou en PHP/Node, jamais en `.ps1`.
 
 ## 6. Ordre de mise en place
