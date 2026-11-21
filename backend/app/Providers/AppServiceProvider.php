@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Blog\Post;
+use App\Models\Career\Education;
+use App\Models\Career\Experience;
 use App\Models\Catalog\Skill;
 use App\Models\Lab\Experiment;
 use App\Models\Media\Media;
@@ -66,6 +68,8 @@ class AppServiceProvider extends ServiceProvider
             'service' => Service::class,
             'experiment' => Experiment::class,
             'post' => Post::class,
+            'experience' => Experience::class,
+            'education' => Education::class,
         ]);
     }
 
