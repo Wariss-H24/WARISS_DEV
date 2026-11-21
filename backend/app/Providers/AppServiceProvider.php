@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use App\Models\Catalog\Skill;
 use App\Models\Media\Media;
+use App\Models\Pages\Page;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -54,6 +55,7 @@ class AppServiceProvider extends ServiceProvider
             'user' => User::class,
             'media' => Media::class,
             'skill' => Skill::class,
+            'page' => Page::class,
         ]);
     }
 
