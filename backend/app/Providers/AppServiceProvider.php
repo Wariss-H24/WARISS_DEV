@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Catalog\Skill;
+use App\Models\Lab\Experiment;
 use App\Models\Media\Media;
 use App\Models\Pages\Page;
 use App\Models\Portfolio\CaseStudy;
@@ -62,6 +63,7 @@ class AppServiceProvider extends ServiceProvider
             'project' => Project::class,
             'case_study' => CaseStudy::class,
             'service' => Service::class,
+            'experiment' => Experiment::class,
         ]);
     }
 
