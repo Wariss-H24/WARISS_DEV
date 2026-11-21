@@ -1,0 +1,15 @@
+includes:
+    - vendor/larastan/larastan/extension.neon
+
+parameters:
+    level: 6
+
+    # config/ n'est pas analysé : c'est le seul dossier où env() est autorisé, et sous Windows
+    # la règle noEnvCallsOutsideOfConfig y produit des faux positifs (casse « c:\ » / « C:\ »).
+    paths:
+        - app/
+        - bootstrap/app.php
+        - database/
+        - routes/
+
+    tmpDir: storage/framework/cache/phpstan

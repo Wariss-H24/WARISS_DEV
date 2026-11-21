@@ -41,11 +41,14 @@ Règles :
 - Toute décision structurante reçoit un numéro (D-xx) et est inscrite dans l'architecture technique, section 8.
 - Les fiches de `01-FUNCTIONAL-SPECIFICATIONS/` ne sont écrites que lorsqu'un module en a besoin avant son développement.
 
-## Dépôts de code
+## Organisation du dépôt
+
+Un seul dépôt (décision D-12) :
 
 ```text
-wariss-dev-api/        # Laravel : API REST, PostgreSQL, Redis
-wariss-dev-frontend/   # monorepo pnpm : apps/web, apps/admin, packages/*
+WARISS_DEV/
+├── backend/          # API Laravel 13 : REST, PostgreSQL, files, tâches planifiées
+├── frontend/         # monorepo pnpm : apps/web, apps/admin, packages/* (à venir)
+├── documentation/    # conception
+└── README.md
 ```
-
-Ce dépôt contient la documentation de conception.

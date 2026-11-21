@@ -13,7 +13,15 @@ Ce document fixe l'architecture de l'API Laravel et des deux interfaces React, r
 
 ## 2. Vue d'ensemble
 
-Trois applications, un seul dépôt de code par côté (API et frontend) :
+Trois applications dans **un seul dépôt Git** (`WARISS_DEV`, décision D-12) : `backend/` pour l'API Laravel, `frontend/` pour le monorepo pnpm, `documentation/` pour la conception.
+
+```text
+WARISS_DEV/
+├── backend/          # API Laravel
+├── frontend/         # monorepo pnpm : apps/web, apps/admin, packages/*
+├── documentation/
+└── README.md
+```
 
 - **API Laravel** (`api.wariss.dev`) : REST versionnée, PostgreSQL, Redis, files d'attente.
 - **Site public** (`wariss.dev`) : React avec rendu serveur, lecture seule via l'API publique.
@@ -34,7 +42,7 @@ Les trois partagent un domaine parent, ce qui permet l'authentification Sanctum 
 ### 3.2 Arborescence
 
 ```text
-wariss-dev-api/
+backend/
 ├── app/
 │   ├── Actions/<Domaine>/          # PublishProject, UploadMedia, SubmitMessage…
 │   ├── Console/Commands/           # purges, agrégation analytics, publication programmée
@@ -143,7 +151,7 @@ React et TypeScript, Vite, React Router, CSS Modules et variables CSS, mobile fi
 ### 4.3 Arborescence retenue
 
 ```text
-wariss-dev-frontend/
+frontend/
 ├── apps/
 │   ├── web/                          # site public, rendu serveur
 │   │   ├── app/
@@ -245,11 +253,11 @@ Les espacements, rayons, ombres, tailles de police et transitions de ton fichier
 
 ### 4.7 Types partagés entre l'API et le frontend (D-10)
 
-Les deux dépôts sont séparés : le contrat entre eux est le fichier OpenAPI.
+Le backend et le frontend sont dans le même dépôt (D-12) : le contrat entre eux est le fichier OpenAPI.
 
-1. **API** : Scramble génère la documentation. La commande d'export de Scramble écrit `openapi.json` à la racine du dépôt API, et ce fichier est **versionné**. La CI de l'API régénère le fichier et échoue s'il diffère de la version committée : tout changement de contrat est donc visible dans la revue de code.
-2. **Frontend** : le script `pnpm api:types` lit le fichier depuis `OPENAPI_SOURCE`, qui vaut par défaut le chemin local `../wariss-dev-api/openapi.json` et peut aussi être une URL de préproduction. Il lance `openapi-typescript` et écrit `packages/api-client/src/schema.d.ts`, qui est **versionné**.
-3. La CI du frontend récupère `openapi.json` depuis la branche principale de l'API, régénère les types et échoue s'il y a une différence. Le build TypeScript détecte ensuite toute utilisation devenue incompatible.
+1. **API** : Scramble génère la documentation. La commande d'export de Scramble écrit `backend/openapi.json`, qui est **versionné**. La CI régénère le fichier et échoue s'il diffère de la version committée : tout changement de contrat est donc visible dans la revue de code.
+2. **Frontend** : le script `pnpm api:types` lit `../backend/openapi.json` (surchargeable par `OPENAPI_SOURCE`), lance `openapi-typescript` et écrit `frontend/packages/api-client/src/schema.d.ts`, qui est **versionné**.
+3. La CI régénère les types et échoue s'il y a une différence. Le build TypeScript détecte ensuite toute utilisation devenue incompatible. Un changement d'API et l'adaptation du frontend peuvent ainsi arriver dans le **même commit**.
 4. `packages/api-client` exporte des alias lisibles (`Project`, `Post`…) et un client typé fin. Aucun type d'API n'est écrit à la main.
 
 ## 5. Dépendances
@@ -260,7 +268,7 @@ Versions : toujours la dernière stable compatible au moment de l'installation. 
 
 ```bash
 php artisan install:api          # installe Sanctum
-composer require laravel/horizon \
+composer require laravel/horizon predis/predis \
   astrotomic/laravel-translatable \
   spatie/laravel-query-builder \
   dedoc/scramble \
@@ -282,6 +290,32 @@ composer require --dev pestphp/pest pestphp/pest-plugin-laravel \
 - **Sitemap** : sitemap avec alternatives de langue. **Backup** : sauvegardes. **Honeypot** : protection des formulaires.
 - **Device Detector** : type d'appareil et détection des robots pour les analytics, sans cookie. **CommonMark** : temps de lecture et extraits des articles.
 - **Pest, Larastan, Pint** : tests, analyse statique, style de code. **Telescope** : débogage en développement uniquement.
+
+**Installé le 21/11/2026 (Laravel 13.43, PHP 8.4)** — versions retenues par Composer :
+
+| Paquet | Version | Remarque |
+| --- | --- | --- |
+| laravel/sanctum | via `install:api` | |
+| predis/predis | ^3.7 | |
+| astrotomic/laravel-translatable | ^11.17 | compatible Laravel 13 : le trait maison n'est pas nécessaire |
+| spatie/laravel-query-builder | ^7.3 | |
+| dedoc/scramble | ^0.13.55 | |
+| intervention/image-laravel | ^4.1 | pilote GD (D-11) |
+| league/flysystem-aws-s3-v3 | ^3.35 | |
+| spatie/laravel-sitemap | ^8.2 | |
+| spatie/laravel-backup | ^10.5 | |
+| spatie/laravel-honeypot | ^4.7 | |
+| matomo/device-detector | ^6.5 | |
+| league/commonmark | ^2.10 | |
+| pestphp/pest (+ plugin Laravel) | ^4.7 / ^4.1 | Pest 5 exigerait PHPUnit 13 ; Laravel 13 est livré avec PHPUnit 12 |
+| larastan/larastan | ^3.15 | niveau 6, `phpstan.neon` |
+| barryvdh/laravel-ide-helper | ^3.8 | |
+| laravel/telescope | ^5.29 | enregistré seulement en environnement `local` |
+| laravel/boost | ^2.10 | consignes et serveur MCP Laravel pour l'assistant IA (`CLAUDE.md`, `.mcp.json`), dev uniquement |
+
+**Horizon n'est pas encore installé** : il exige `pcntl` et `posix`, absents sous Windows, et ne sert qu'avec Redis en production. Il sera ajouté à l'étape du déploiement (D-11).
+
+Commandes du backend : `composer dev` (serveur + file d'attente), `composer test`, `composer lint` / `composer format` (Pint), `composer analyse` (Larastan), `composer check` (les trois).
 
 ### 5.2 Frontend (pnpm)
 
@@ -321,6 +355,26 @@ pnpm add -D -w eslint typescript-eslint eslint-plugin-react-hooks eslint-plugin-
 
 PHP (version supportée la plus récente compatible avec Laravel), Composer, Node.js LTS, pnpm, PostgreSQL, Redis, Git. Un serveur Node est nécessaire en production pour le rendu serveur du site public.
 
+### 5.4 Poste de développement (Windows, vérifié le 21/11/2026) — D-11
+
+| Outil | Version constatée | Statut |
+| --- | --- | --- |
+| PHP (Laragon) | 8.4.22 NTS | OK. `pdo_pgsql` et `pgsql` activées le 21/11/2026 (sauvegarde : `php.ini.bak-2026-11-21`) |
+| Composer | 2.10.1 | OK |
+| PostgreSQL | 18.3, service `postgresql-x64-18`, port 5432 | OK. `psql` absent du PATH : `C:\Program Files\PostgreSQL\18\bin` |
+| Node.js | 26.13.1 (LTS), dans `C:\Users\wariss.bada\node-v26.13.1-win-x64\` | OK (remplace la 25.9.0 le 21/11/2026) |
+| pnpm | 12.4.2 | OK |
+| Redis | Laragon 5.0.14 (portage Windows ancien), extension PHP `redis` absente | Non utilisé en local ; client `predis/predis` pour la production |
+| Docker | 29.7.2 | Installé mais **inaccessible** (droits du poste d'entreprise) : aucun outil du projet ne doit en dépendre en local |
+| Git | 2.54.0 | OK |
+
+Conséquences en développement sous Windows :
+
+- **Horizon ne fonctionne pas sous Windows** : il exige l'extension `pcntl`, qui n'existe pas sur cette plateforme. En local, les files tournent avec `php artisan queue:listen` (lancé par `composer dev`) ; Horizon sera installé à l'étape du déploiement, pour la production Linux seulement.
+- **Redis** : client `predis/predis` (pur PHP, sans extension). En local, **cache, files et sessions utilisent le pilote `database`** (PostgreSQL), car Docker n'est pas accessible ; la production utilise Redis. Le code ne doit donc jamais dépendre d'une fonction propre à Redis : seulement des façades `Cache`, `Queue` et `Session` de Laravel. Les tests tournent avec les pilotes `array` et `sync`.
+- **Images** : `imagick` absente, Intervention Image utilise le pilote **GD** (présent).
+- **PowerShell** est bloqué par une stratégie de groupe sur ce poste : les scripts du projet sont écrits pour Bash (Git Bash) ou en PHP/Node, jamais en `.ps1`.
+
 ## 6. Ordre de mise en place
 
 1. Créer le projet Laravel, les migrations et les seeders (compte `admin`, compte `viewer`, pages système, menus, réglages).
@@ -352,4 +406,6 @@ Décisions prises le 21 novembre 2026 pour lever les incohérences entre documen
 | D-07 | E-mail insensible à la casse | Minuscules à l'enregistrement + index unique `lower(email)`. Pas de `citext`. | Simple, sans extension, fiable avec Eloquent | Base de données (D1, D13, index) |
 | D-08 | Recherche FR/EN | `search_vector` générée avec la configuration `french` ou `english` selon `locale`, pondérée, sans accents via `immutable_unaccent()`. | La recherche française est fausse avec la configuration anglaise, et inversement | Base de données (conventions, index, migrations) |
 | D-09 | Aperçu des brouillons | Lien signé Laravel de 30 minutes, route `/:lang/preview/:token`, `no-store` + `noindex`, aucune table. | Exigence du cahier des charges §22.3 sans exposition publique | Architecture §3.8, cahier des charges §22.3 |
-| D-10 | Types TypeScript entre deux dépôts | `openapi.json` versionné dans l'API, types générés et versionnés dans `packages/api-client`, contrôle de différence en CI des deux côtés. | Le contrat d'API devient explicite et vérifié automatiquement | Architecture §4.7 |
+| D-10 | Types TypeScript entre l'API et le frontend | `backend/openapi.json` versionné, types générés et versionnés dans `frontend/packages/api-client`, contrôle de différence en CI. | Le contrat d'API devient explicite et vérifié automatiquement | Architecture §4.7 |
+| D-12 | Un ou plusieurs dépôts | Un seul dépôt `WARISS_DEV` : `backend/`, `frontend/`, `documentation/`. | Demande du propriétaire ; un seul historique, contrat d'API et frontend modifiables dans le même commit, une seule CI | Architecture §2, §3.2, §4.3, §4.7 ; README |
+| D-11 | Développement sous Windows | `queue:listen` en local ; Horizon installé au déploiement, production Linux seulement ; pas de Docker en local (inaccessible) ; tests sur PostgreSQL `wariss_dev_test`, jamais SQLite ; client `predis/predis` ; pilote GD pour les images ; scripts en Bash, PHP ou Node ; Node LTS pair. | `pcntl`, `phpredis` et `imagick` sont indisponibles sur le poste ; PowerShell est bloqué par stratégie de groupe | Architecture §5.4 |
