@@ -2,6 +2,9 @@
 
 namespace App\Providers;
 
+use App\Models\Media\Media;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -34,6 +37,22 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configurePasswordPolicy();
+        $this->configureMorphMap();
+    }
+
+    /**
+     * Alias courts des types polymorphes (mediables, seo_metadata, activity_logs…).
+     *
+     * Les tables stockent l'alias, jamais le nom de la classe : renommer une classe
+     * ne casse pas les données. Un modèle absent de cette liste provoque une erreur.
+     * Chaque nouveau modèle rattachable est ajouté ici avec son module.
+     */
+    protected function configureMorphMap(): void
+    {
+        Relation::enforceMorphMap([
+            'user' => User::class,
+            'media' => Media::class,
+        ]);
     }
 
     /**
