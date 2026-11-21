@@ -1,0 +1,28 @@
+<?php
+
+namespace Database\Factories\Blog;
+
+use App\Models\Blog\Tag;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends Factory<Tag>
+ */
+class TagFactory extends Factory
+{
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $name = fake()->unique()->word().' '.fake()->unique()->numberBetween(1, 99_999);
+
+        return [
+            'fr' => ['name' => $name, 'slug' => Str::slug($name)],
+            'en' => ['name' => $name, 'slug' => Str::slug($name)],
+        ];
+    }
+}
