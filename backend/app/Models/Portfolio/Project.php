@@ -5,9 +5,11 @@ namespace App\Models\Portfolio;
 use App\Enums\ProjectKind;
 use App\Enums\ProjectStage;
 use App\Enums\PublicationStatus;
+use App\Models\Career\TimelineEvent;
 use App\Models\Catalog\Skill;
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Support\Concerns\AppearsInTimeline;
 use App\Support\Concerns\HasMediaAttachments;
 use App\Support\Concerns\HasPublicationStatus;
 use App\Support\Concerns\OrderedByPosition;
@@ -110,6 +112,8 @@ use Illuminate\Support\Carbon;
  *
  * @property-read Collection<int, CaseStudy> $caseStudies
  * @property-read int|null $case_studies_count
+ * @property-read Collection<int, TimelineEvent> $timelineEvents
+ * @property-read int|null $timeline_events_count
  *
  * @mixin \Eloquent
  */
@@ -122,7 +126,7 @@ use Illuminate\Support\Carbon;
 class Project extends Model implements TranslatableContract
 {
     /** @use HasFactory<ProjectFactory> */
-    use HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
+    use AppearsInTimeline, HasFactory, HasMediaAttachments, HasPublicationStatus, OrderedByPosition, SearchableTranslations, SoftDeletes, Translatable;
 
     /**
      * @var list<string>

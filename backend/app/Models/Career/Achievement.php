@@ -4,6 +4,7 @@ namespace App\Models\Career;
 
 use App\Enums\AchievementType;
 use App\Models\Media\Media;
+use App\Support\Concerns\AppearsInTimeline;
 use App\Support\Concerns\OrderedByPosition;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -66,6 +67,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Achievement whereUrl($value)
  * @method static Builder<static>|Achievement withTranslation(?string $locale = null)
  *
+ * @property-read Collection<int, TimelineEvent> $timelineEvents
+ * @property-read int|null $timeline_events_count
+ *
  * @mixin \Eloquent
  */
 #[Table('achievements')]
@@ -73,7 +77,7 @@ use Illuminate\Support\Carbon;
 class Achievement extends Model implements TranslatableContract
 {
     /** @use HasFactory<AchievementFactory> */
-    use HasFactory, OrderedByPosition, Translatable;
+    use AppearsInTimeline, HasFactory, OrderedByPosition, Translatable;
 
     /**
      * @var list<string>

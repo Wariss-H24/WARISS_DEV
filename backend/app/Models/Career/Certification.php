@@ -4,6 +4,7 @@ namespace App\Models\Career;
 
 use App\Models\Catalog\Technology;
 use App\Models\Media\Media;
+use App\Support\Concerns\AppearsInTimeline;
 use App\Support\Concerns\OrderedByPosition;
 use Astrotomic\Translatable\Contracts\Translatable as TranslatableContract;
 use Astrotomic\Translatable\Translatable;
@@ -72,6 +73,9 @@ use Illuminate\Support\Carbon;
  * @method static Builder<static>|Certification whereVerificationUrl($value)
  * @method static Builder<static>|Certification withTranslation(?string $locale = null)
  *
+ * @property-read Collection<int, TimelineEvent> $timelineEvents
+ * @property-read int|null $timeline_events_count
+ *
  * @mixin \Eloquent
  */
 #[Table('certifications')]
@@ -82,7 +86,7 @@ use Illuminate\Support\Carbon;
 class Certification extends Model implements TranslatableContract
 {
     /** @use HasFactory<CertificationFactory> */
-    use HasFactory, OrderedByPosition, Translatable;
+    use AppearsInTimeline, HasFactory, OrderedByPosition, Translatable;
 
     /**
      * @var list<string>
