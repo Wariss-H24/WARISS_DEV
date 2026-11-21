@@ -6,6 +6,7 @@ use App\Models\Catalog\Skill;
 use App\Models\Media\Media;
 use App\Models\Pages\Page;
 use App\Models\Portfolio\Project;
+use App\Models\Services\Service;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\ServiceProvider;
@@ -58,6 +59,7 @@ class AppServiceProvider extends ServiceProvider
             'skill' => Skill::class,
             'page' => Page::class,
             'project' => Project::class,
+            'service' => Service::class,
         ]);
     }
 
