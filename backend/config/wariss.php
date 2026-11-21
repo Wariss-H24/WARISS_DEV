@@ -29,4 +29,14 @@ return [
         ],
     ],
 
+    /*
+    | Durées de conservation des données (décision validée « Conservation »).
+    | Les données plus anciennes sont supprimées par la tâche planifiée model:prune.
+    */
+    'retention' => [
+        'messages_months' => 24,
+        'activity_logs_months' => 12,
+        'analytics_raw_days' => 90,
+    ],
+
 ];
