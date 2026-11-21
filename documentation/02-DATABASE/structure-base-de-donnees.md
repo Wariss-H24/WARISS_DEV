@@ -141,7 +141,7 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 
 ## D15 — CV
 
-- `resumes` — `title`, `target` (general, freelance, employment, other), `locale` (char 2), `status` (draft, active, archived), `is_default` (bool), `is_public` (bool), `current_version_id?→resume_versions` (SET NULL, ajoutée par une migration dédiée une fois les deux tables créées). Index unique partiel : un seul CV public par défaut par langue.
+- `resumes` — `title`, `target` (general, freelance, employment, other), `locale` (char 2), `status` (draft, active, archived), `is_default` (bool), `is_public` (bool), `current_version_id?→resume_versions` (SET NULL, ajoutée par une migration dédiée une fois les deux tables créées). Index unique partiel : un seul CV public par défaut par langue. **D-17** : la clé de `current_version_id` est composée (`id`, `current_version_id`) → `resume_versions (resume_id, id)`, `ON DELETE SET NULL (current_version_id)` : la version courante appartient toujours à ce CV. CHECK : un CV public est actif et a une version courante ; un CV par défaut est public (la version courante d'un CV public ne peut donc pas être supprimée).
 - `resume_versions` — `resume_id→resumes` (CASCADE), `media_id→media` (RESTRICT), `version_number` (int, unique avec `resume_id`), `change_note?`, `created_by?→users` (SET NULL). Seule la version courante est téléchargeable publiquement.
 
 ## D16 — Administration, sécurité et SEO
