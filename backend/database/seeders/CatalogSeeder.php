@@ -4,18 +4,33 @@ namespace Database\Seeders;
 
 use App\Models\Catalog\SkillCategory;
 use App\Models\Catalog\TechnologyCategory;
+use App\Models\Portfolio\ProjectCategory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 
 /**
- * Catégories de départ des technologies (D4) et des compétences (D5), en français et en anglais.
+ * Catégories de départ des technologies (D4), des compétences (D5) et des projets (D6),
+ * en français et en anglais.
  *
  * Idempotent : une catégorie déjà présente (même slug français) n'est pas modifiée.
- * Les technologies et compétences elles-mêmes ne sont pas créées : elles doivent refléter
- * ce que le propriétaire maîtrise réellement et sont saisies dans l'administration.
+ * Les technologies, compétences et projets eux-mêmes ne sont pas créés : ils doivent refléter
+ * ce que le propriétaire a réellement réalisé et sont saisis dans l'administration.
  */
 class CatalogSeeder extends Seeder
 {
+    /**
+     * Natures de projets du cahier des charges (§9.4).
+     *
+     * @var list<array{fr: string, en: string, fr_slug: string, en_slug: string}>
+     */
+    private const PROJECT_CATEGORIES = [
+        ['fr' => 'Applications web', 'en' => 'Web applications', 'fr_slug' => 'applications-web', 'en_slug' => 'web-applications'],
+        ['fr' => 'E-commerce', 'en' => 'E-commerce', 'fr_slug' => 'e-commerce', 'en_slug' => 'e-commerce'],
+        ['fr' => 'Plateformes éducatives', 'en' => 'Educational platforms', 'fr_slug' => 'plateformes-educatives', 'en_slug' => 'educational-platforms'],
+        ['fr' => 'Outils de gestion', 'en' => 'Management tools', 'fr_slug' => 'outils-de-gestion', 'en_slug' => 'management-tools'],
+        ['fr' => 'Applications mobiles', 'en' => 'Mobile applications', 'fr_slug' => 'applications-mobiles', 'en_slug' => 'mobile-applications'],
+    ];
+
     /**
      * @var list<array{fr: string, en: string, fr_slug: string, en_slug: string}>
      */
@@ -48,10 +63,11 @@ class CatalogSeeder extends Seeder
     {
         $this->seedCategories(TechnologyCategory::class, self::TECHNOLOGY_CATEGORIES);
         $this->seedCategories(SkillCategory::class, self::SKILL_CATEGORIES);
+        $this->seedCategories(ProjectCategory::class, self::PROJECT_CATEGORIES);
     }
 
     /**
-     * @param  class-string<TechnologyCategory|SkillCategory>  $model
+     * @param  class-string<TechnologyCategory|SkillCategory|ProjectCategory>  $model
      * @param  list<array{fr: string, en: string, fr_slug: string, en_slug: string}>  $categories
      */
     private function seedCategories(string $model, array $categories): void
