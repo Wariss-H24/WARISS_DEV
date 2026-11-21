@@ -49,14 +49,14 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 ## D1 — Identité et profil
 
 - `users` — `name`, `email` (stocké en minuscules, index unique sur `lower(email)` : D-07), `password`, `role` (admin, viewer ; défaut viewer), `is_active` (bool), `last_login_at?`, `email_verified_at?`, `remember_token?`. Comptes d'administration uniquement : aucun compte visiteur n'existe. Deux comptes prévus, créés par un seeder : admin (propriétaire du site) et viewer (lecture seule, pour un ami).
-- `profiles` — `user_id→users` (unique, CASCADE), `first_name`, `last_name`, `display_name`, `public_email`, `public_phone?`, `country_code?` (char 2), `avatar_media_id?→media`, `cover_media_id?→media`, `availability_status` (available, limited, unavailable), `available_from?` (date), `spoken_languages` (jsonb, ex. code + niveau). Traductions : `headline`, `short_bio`, `biography` (text), `location_label?`, `availability_note?`.
-- `social_links` — `profile_id→profiles` (CASCADE), `platform`, `url`, `is_visible`, `position`.
+- `profiles` — `user_id→users` (unique, CASCADE), `first_name`, `last_name`, `display_name`, `public_email`, `public_phone?`, `country_code?` (char 2), `avatar_media_id?→media`, `cover_media_id?→media`, `availability_status` (available, limited, unavailable), `available_from?` (date), `spoken_languages` (jsonb, liste : ex. code + niveau ; CHECK tableau). `country_code` : CHECK deux majuscules (ISO 3166-1). Traductions : `headline`, `short_bio`, `biography` (text), `location_label?`, `availability_note?`.
+- `social_links` — `profile_id→profiles` (CASCADE), `platform`, `url` (CHECK `https?://` ou `mailto:`, D-15), `is_visible`, `position`.
 
 ## D2 — Configuration et navigation
 
-- `site_settings` — `group`, `key` (unique avec `group`), `type` (string, text, bool, int, json, media), `value?` (jsonb), `is_translatable` (bool), `is_public` (bool : seuls les réglages publics sont exposés par l'API). Logo et favicon sont des réglages de type `media`. Traductions : `value` (text).
+- `site_settings` — `group`, `key` (unique avec `group`), `type` (string, text, bool, int, json, media), `value?` (jsonb), `is_translatable` (bool), `is_public` (bool : seuls les réglages publics sont exposés par l'API). Logo et favicon sont des réglages de type `media`. Traductions : `value` (text). **D-15** : la valeur JSON correspond au type (CHECK `site_settings_value_type_check`) ; un réglage traduisible est de type `string` ou `text` et n'a pas de `value` propre ; `is_public` faux par défaut.
 - `navigation_menus` — `name`, `slug` (unique), `location?` (unique : header, footer, secondary, legal), `is_active`.
-- `navigation_items` — `navigation_menu_id→navigation_menus` (CASCADE), `parent_id?→navigation_items` (CASCADE), `type` (page, route, external), `page_id?→pages` (CASCADE), `route_key?` (route frontend fixe : projects, blog, contact…), `url?`, `icon?`, `opens_in_new_tab`, `is_visible`, `position`. CHECK : un seul champ de destination rempli, selon `type`. Traductions : `label`.
+- `navigation_items` — `navigation_menu_id→navigation_menus` (CASCADE), `parent_id?→navigation_items` (CASCADE), `type` (page, route, external), `page_id?→pages` (CASCADE), `route_key?` (route frontend fixe : projects, blog, contact…), `url?`, `icon?`, `opens_in_new_tab`, `is_visible`, `position`. CHECK : un seul champ de destination rempli, selon `type` ; `url` limitée à `https?://` et `mailto:` ; un élément ne peut pas être son propre parent. Les pages système sont liées par `type = page` (D-15). Traductions : `label`.
 
 ## D18 — Pages et sections
 
