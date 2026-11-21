@@ -153,7 +153,8 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 ## D17 — Analytics
 
 - `page_views` — `viewed_at`, `path`, `locale` (char 2), `viewable_type?`, `viewable_id?`, `session_hash` (char 64 : hash quotidien non réversible, sans cookie), `referrer_host?`, `referrer_type` (direct, search, social, other), `utm_source?`, `utm_medium?`, `utm_campaign?`, `device_type` (desktop, mobile, tablet), `country_code?`. Aucune ligne pour les robots ni pour l'administration. Pas de `created_at`/`updated_at`.
-- `events` — `occurred_at`, `name` (cv\_download, cta\_click, contact\_submit, newsletter\_subscribe, demo\_open, outbound\_click), `path`, `eventable_type?`, `eventable_id?`, `session_hash`, `properties` (jsonb).
+- `events` — `occurred_at`, `name` (cv\_download, cta\_click, contact\_submit, newsletter\_subscribe, demo\_open, outbound\_click, share), `path`, `eventable_type?`, `eventable_id?`, `session_hash`, `properties` (jsonb ; pour `share` : `network` = linkedin, x, facebook, whatsapp, email, copy\_link).
+- **Partages (D-16)** : un clic sur un bouton de partage enregistre un événement `share`. Les liens partagés portent `utm_source=<réseau>&utm_medium=share` : les visites qu'ils amènent sont attribuées au réseau dans `page_views`, même quand le réseau ne transmet pas de référent (WhatsApp, e-mail). Un lien copié à la main depuis la barre d'adresse ne peut pas être détecté comme partage ; ses visites apparaissent selon leur référent (social, direct…).
 - `analytics_daily_stats` — `stat_date` (date), `metric`, `dimension_type` (vide par défaut), `dimension_value` (vide par défaut), `value` (bigint), unique sur les quatre premières colonnes. Alimente le tableau de bord. Données brutes conservées 90 jours puis purgées ; agrégats conservés.
 
 ## Tables natives de Laravel
