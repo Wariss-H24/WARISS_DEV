@@ -108,6 +108,9 @@ use Illuminate\Support\Carbon;
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Project withTrashed(bool $withTrashed = true)
  * @method static \Illuminate\Database\Eloquent\Builder<static>|Project withoutTrashed()
  *
+ * @property-read Collection<int, CaseStudy> $caseStudies
+ * @property-read int|null $case_studies_count
+ *
  * @mixin \Eloquent
  */
 #[Table('projects')]
@@ -164,6 +167,14 @@ class Project extends Model implements TranslatableContract
     public function skills(): BelongsToMany
     {
         return $this->belongsToMany(Skill::class);
+    }
+
+    /**
+     * @return HasMany<CaseStudy, $this>
+     */
+    public function caseStudies(): HasMany
+    {
+        return $this->hasMany(CaseStudy::class);
     }
 
     /**

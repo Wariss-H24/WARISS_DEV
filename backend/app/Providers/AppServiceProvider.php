@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Models\Catalog\Skill;
 use App\Models\Media\Media;
 use App\Models\Pages\Page;
+use App\Models\Portfolio\CaseStudy;
 use App\Models\Portfolio\Project;
 use App\Models\Services\Service;
 use App\Models\User;
@@ -59,6 +60,7 @@ class AppServiceProvider extends ServiceProvider
             'skill' => Skill::class,
             'page' => Page::class,
             'project' => Project::class,
+            'case_study' => CaseStudy::class,
             'service' => Service::class,
         ]);
     }
