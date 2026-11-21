@@ -14,7 +14,9 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 - **Traductions** : chaque entité traduisible a une table `<entité>_translations` (`id`, `<entité>_id` en CASCADE, `locale`, unique sur le couple). Les colonnes listées après « Traductions : » vivent dans cette table. Les slugs sont traduits et uniques par `(locale, slug)`. Français par défaut, anglais en second.
 - **Suppression** : CASCADE pour traductions et pivots ; RESTRICT pour catégories et médias utilisés ; SET NULL pour les liens facultatifs.
 - **JSONB** : uniquement pour la configuration et des détails réellement flexibles.
-- **Recherche** : colonne `search_vector` (tsvector générée) et index GIN sur les traductions des articles, projets, services et expérimentations.
+- **Recherche (D-08)** : colonne `search_vector` (tsvector générée, `STORED`) et index GIN sur les traductions des articles, projets, services et expérimentations. La configuration linguistique dépend de la ligne : `CASE locale WHEN 'fr' THEN 'french'::regconfig ELSE 'english'::regconfig END`. Pondération : titre (A), résumé ou extrait (B), contenu (C). Les accents sont ignorés grâce à l'extension `unaccent`, appelée via une fonction `immutable_unaccent()` créée par migration (la fonction native n'est pas `IMMUTABLE`, ce qu'exige une colonne générée).
+- **Slugs et suppression douce (D-06)** : un contenu supprimé en douceur (`deleted_at`) **garde son slug réservé**. L'unicité `(locale, slug)` reste donc totale. Cela permet de restaurer un contenu sans conflit et évite qu'une ancienne URL indexée pointe soudain vers un autre contenu. Pour réutiliser un slug, il faut supprimer définitivement l'ancien contenu ou modifier son slug. Quand le slug d'un contenu publié change, une ligne `redirects` (301) est créée automatiquement.
+- **E-mails (D-07)** : les adresses sont enregistrées en minuscules (normalisation dans le modèle) et protégées par un index unique sur `lower(email)`, créé par une requête SQL dans la migration. Concerné : `users.email`, `newsletter_subscribers.email`. Le type `citext` n'est pas utilisé, pour éviter une extension de plus et les cas particuliers avec Eloquent.
 - **Secrets** : jamais en base, uniquement dans `.env`.
 - **Notation** : `?` = nullable ; `→` = clé étrangère ; (SD) = soft delete ; (ED) = colonnes éditoriales.
 - **Images** : une image unique et fixe (avatar, couverture, logo, certificat) est une clé étrangère directe `*_media_id` (intégrité garantie) ; les galeries et pièces jointes passent par la table `mediables`.
@@ -44,7 +46,7 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 
 ## D1 — Identité et profil
 
-- `users` — `name`, `email` (unique, insensible à la casse), `password`, `role` (admin, viewer ; défaut viewer), `is_active` (bool), `last_login_at?`, `email_verified_at?`, `remember_token?`. Comptes d'administration uniquement : aucun compte visiteur n'existe. Deux comptes prévus, créés par un seeder : admin (propriétaire du site) et viewer (lecture seule, pour un ami).
+- `users` — `name`, `email` (stocké en minuscules, index unique sur `lower(email)` : D-07), `password`, `role` (admin, viewer ; défaut viewer), `is_active` (bool), `last_login_at?`, `email_verified_at?`, `remember_token?`. Comptes d'administration uniquement : aucun compte visiteur n'existe. Deux comptes prévus, créés par un seeder : admin (propriétaire du site) et viewer (lecture seule, pour un ami).
 - `profiles` — `user_id→users` (unique, CASCADE), `first_name`, `last_name`, `display_name`, `public_email`, `public_phone?`, `country_code?` (char 2), `avatar_media_id?→media`, `cover_media_id?→media`, `availability_status` (available, limited, unavailable), `available_from?` (date), `spoken_languages` (jsonb, ex. code + niveau). Traductions : `headline`, `short_bio`, `biography` (text), `location_label?`, `availability_note?`.
 - `social_links` — `profile_id→profiles` (CASCADE), `platform`, `url`, `is_visible`, `position`.
 
@@ -56,7 +58,7 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 
 ## D18 — Pages et sections
 
-- `pages` — `key` (unique : home, about, legal-notice…), `kind` (system, custom), `template`, `status`, `published_at?` (SD). Les pages système ne peuvent pas être supprimées. Traductions : `title`, `slug?` (nul pour les pages système, dont la route est fixe ; unique par langue sinon), `summary?`.
+- `pages` — `key` (unique : home, about, now, uses, legal-notice, privacy…), `kind` (system, custom), `template`, `status`, `published_at?` (SD). Les pages système ne peuvent pas être supprimées. Traductions : `title`, `slug?` (nul pour les pages système, dont la route est fixe ; unique par langue sinon), `summary?`.
 - `page_sections` — `page_id→pages` (CASCADE), `type` (hero, about, skills, featured\_projects, experiences, services, latest\_posts, cta, contact, richtext, gallery, faq), `position`, `is_active`, `config` (jsonb : variante, nombre d'éléments, mise en page). Chaque `type` correspond à un composant React. Traductions : `title?`, `subtitle?`, `body?` (text), `cta_label?`, `cta_url?`.
 - `page_section_items` — `page_section_id→page_sections` (CASCADE), `itemable_type`, `itemable_id`, `position`. Contenus mis en avant (projets, services, articles…), unique sur section + type + id. Le contenu n'est jamais recopié.
 
@@ -125,7 +127,7 @@ Le modèle compte 86 tables métier (dont 30 tables de traduction et 9 tables pi
 
 - `messages` — `type` (contact, quote, collaboration), `service_id?→services` (SET NULL), `name`, `email`, `subject?`, `body` (text), `details` (jsonb : budget, délai, type de projet pour un devis), `locale` (char 2), `consent_given` (bool), `consented_at?`, `status` (new, read, in\_progress, replied, archived, spam), `read_at?`, `replied_at?`, `internal_note?` (text), `ip_hash?` (char 64) (SD). Purge planifiée : suppression au bout de 24 mois. Une seule table pour contact et devis, sans duplication du formulaire.
 - `testimonials` — `author_name`, `author_company?`, `photo_media_id?→media` (SET NULL), `project_id?→projects` (SET NULL), `given_on?` (date), `consent_given` (bool), `status` (pending, approved, rejected), `is_visible`, `is_featured`, `position`. Traductions : `quote` (text), `author_role?`. Publié seulement si `approved` et `consent_given`.
-- `newsletter_subscribers` — `email` (unique), `locale`, `status` (pending, subscribed, unsubscribed, bounced), `confirmation_token_hash?`, `confirmed_at?`, `consented_at`, `consent_source`, `unsubscribed_at?`, `ip_hash?`. Suppression définitive sur demande.
+- `newsletter_subscribers` — `email` (stocké en minuscules, index unique sur `lower(email)` : D-07), `locale`, `status` (pending, subscribed, unsubscribed, bounced), `confirmation_token_hash?`, `confirmed_at?`, `consented_at`, `consent_source`, `unsubscribed_at?`, `ip_hash?`. Suppression définitive sur demande.
 - `newsletter_campaigns` — `locale`, `subject`, `preview_text?`, `body` (text), `status` (draft, scheduled, sending, sent, failed), `scheduled_at?`, `sent_at?`, `recipients_count` (int), `created_by?→users` (SET NULL). Une campagne est rédigée dans une seule langue : exception volontaire à la règle des traductions.
 - `newsletter_campaign_recipients` — `campaign_id→newsletter_campaigns` (CASCADE), `subscriber_id→newsletter_subscribers` (CASCADE), `status` (queued, sent, failed, bounced), `sent_at?`, `error?`, unique sur campagne + abonné.
 
@@ -173,6 +175,8 @@ Les types polymorphes utilisent un alias court (project, post, service…) via l
 - Unique `(locale, slug)` sur chaque table de traduction qui porte un slug.
 - CHECK sur les dates (fin ≥ début), les niveaux (1 à 5), les codes de redirection et la destination des éléments de menu.
 - Index GIN sur les colonnes `search_vector`.
+- Index unique fonctionnel sur `lower(email)` pour `users` et `newsletter_subscribers`.
+- Extension `unaccent` et fonction `immutable_unaccent()` créées par la première migration applicative.
 - Tâches planifiées : purge des messages, du journal d'activité et des données analytics brutes ; publication des contenus programmés.
 
 ## Ordre de création des migrations
@@ -185,7 +189,9 @@ Les types polymorphes utilisent un alias court (project, post, service…) via l
 6. Tables pivots.
 7. Communication, CV (puis `current_version_id`), SEO, redirections.
 8. Journal d'activité et analytics.
-9. Seeders : compte `admin`, compte `viewer`, pages système, menus, réglages, catégories de départ.
+9. Seeders : compte `admin`, compte `viewer`, pages système (dont `now` et `uses`), menus, réglages, catégories de départ.
+
+L'étape 1 crée aussi l'extension `unaccent` et la fonction `immutable_unaccent()` (D-08), nécessaires aux colonnes `search_vector` des étapes suivantes.
 
 ## Décisions validées avant les migrations
 
@@ -193,5 +199,11 @@ Les types polymorphes utilisent un alias court (project, post, service…) via l
 - Conservation : messages 24 mois, journal d'activité 12 mois, analytics bruts 90 jours ; statistiques agrégées conservées plus longtemps, sans donnée identifiante : validé.
 - Pas de commentaires publics sur le blog : validé.
 - Langues : français et anglais, URLs `/fr/...` et `/en/...` : validé.
+- Rôles par colonne `users.role` (admin, viewer), sans tables `roles` et `permissions` en V1 (D-04) : validé.
+- Slugs réservés pendant la suppression douce, redirection 301 automatique quand un slug publié change (D-06) : validé.
+- E-mails normalisés en minuscules avec index unique sur `lower(email)` (D-07) : validé.
+- Recherche plein texte selon la langue de la ligne, sans tenir compte des accents (D-08) : validé.
+- Aperçu des brouillons par lien signé, sans table supplémentaire (D-09) : validé.
+- Pages Now et Uses gérées comme pages système du domaine D18, sans table dédiée : validé.
 
-Prochaines étapes : l'architecture backend, frontend et les dépendances sont rédigées dans le document « Architecture technique ». Il reste à valider cette structure (avec ou sans schémas MCD/MLD), puis à créer le projet Laravel : migrations, modèles et seeders.
+Prochaine étape : créer le projet Laravel, puis les migrations, modèles et seeders, dans l'ordre ci-dessus. Les schémas MCD/MLD seront générés depuis la base réelle (outil de diagramme sur le schéma PostgreSQL) plutôt que dessinés à la main, pour rester à jour.

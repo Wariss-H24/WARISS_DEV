@@ -1,10 +1,12 @@
 # WARISS.DEV — Cahier des charges général
 ## Spécifications fonctionnelles et techniques de référence
 
-**Version :** 1.0  
-**Date :** 20 novembre 2026  
+**Version :** 1.1  
+**Date :** 21 novembre 2026 (v1.0 du 20 novembre 2026)  
 **Statut :** Document de cadrage global — base de référence pour la conception détaillée  
 **Projet :** WARISS.DEV
+
+> **Version 1.1 :** ce document est désormais l'**unique cahier des charges de référence**. Il intègre les éléments du premier cahier des charges (14 novembre 2026) qui n'y figuraient pas : pages Now et Uses, thème clair/sombre, commandes du terminal, contact de style terminal avec alternative accessible et découpage en lots de livraison. Les décisions D-01 à D-10 du 21 novembre 2026 sont reportées dans les sections concernées et détaillées dans [l'architecture technique, section 8](../03-TECHNICAL-ARCHITECTURE/architecture-technique.md#8-registre-des-décisions). Ancienne version archivée : [99-ARCHIVE](../99-ARCHIVE/cahier-des-charges-general_2026-11-14.md).
 
 ---
 
@@ -738,6 +740,10 @@ Le visiteur pourra envoyer un message comprenant selon le besoin :
 
 Les messages devront être stockés et consultables dans l'administration.
 
+Une expérience originale est prévue : une **interface inspirée d'un terminal** dans laquelle le visiteur renseigne les informations étape par étape. Un **formulaire classique accessible** doit toujours être proposé en alternative, avec le même traitement côté serveur (validation, enregistrement, protection anti-spam). Les deux interfaces envoient la même requête à la même route de l'API.
+
+Le système doit valider les données, afficher des erreurs compréhensibles, confirmer l'envoi et être protégé contre le spam et les abus.
+
 ## 16.3 Gestion des messages
 
 L'administrateur pourra :
@@ -922,6 +928,8 @@ Les permissions devront contrôler les actions possibles : consulter, créer, mo
 
 Pour la première version, un seul administrateur peut suffire, mais la conception ne doit pas rendre impossible l'évolution.
 
+**Décision D-04 (21/11/2026) :** la première version utilise une colonne `role` sur `users` avec deux valeurs : `admin` (tous les droits) et `viewer` (lecture seule, sans accès aux données sensibles). Il n'y a pas de tables `roles` et `permissions` en V1. Toutes les autorisations passent par les Policies Laravel, ce qui permettra de migrer vers des rôles et permissions en base (par exemple `spatie/laravel-permission`) sans toucher aux contrôleurs, si des rôles éditeur ou contributeur deviennent nécessaires.
+
 ## 19.4 Journal d'activité
 
 Les actions importantes pourront être historisées :
@@ -968,9 +976,7 @@ Les métadonnées peuvent être gérées de manière centralisée ou associées 
 
 ## 19.7 Entités candidates
 
-- `roles`
-- `permissions`
-- tables pivots utilisateurs-rôles et rôles-permissions, selon le modèle retenu ;
+- ~~`roles`, `permissions` et leurs tables pivots~~ : remplacés en V1 par la colonne `users.role` (décision D-04) ;
 - `activity_logs`
 - `seo_metadata`
 - `redirects`
@@ -1045,10 +1051,53 @@ La liste pourra évoluer, mais le périmètre de départ comprend notamment :
 - Détail d'un article ;
 - Certifications et réalisations ;
 - Contact ;
+- Témoignages ;
 - Terminal ou espace de démonstration interactif ;
-- pages légales et pages d'information.
+- **Now** : ce sur quoi le propriétaire travaille actuellement (projets en cours, technologies étudiées, objectifs, apprentissages récents) ;
+- **Uses** : outils, logiciels, équipements et environnement de travail ;
+- confirmation et désinscription de la newsletter ;
+- pages légales et pages d'information (mentions légales, confidentialité, cookies si nécessaire) ;
+- page 404.
 
 Toutes les pages ne doivent pas obligatoirement être enregistrées comme des pages libres en base de données. Certaines sont des routes frontend fixes qui affichent des données issues des modules correspondants.
+
+Les pages **Now** et **Uses** sont des pages éditoriales gérées par le module Pages et sections (pages système `now` et `uses` composées de sections `richtext`), sans table dédiée.
+
+## 21.2 bis Routes publiques
+
+Décision D-03 (21/11/2026) : toutes les routes sont préfixées par la langue. Les segments de route restent en anglais et identiques dans les deux langues ; seuls les slugs de contenu sont traduits.
+
+```text
+/                          → redirection vers /fr ou /en
+/:lang                     Accueil
+/:lang/about
+/:lang/skills
+/:lang/experience
+/:lang/projects            /:lang/projects/:slug
+/:lang/case-studies/:slug
+/:lang/services            /:lang/services/:slug
+/:lang/lab                 /:lang/lab/:slug
+/:lang/blog                /:lang/blog/:slug
+/:lang/blog/category/:slug /:lang/blog/tag/:slug
+/:lang/achievements
+/:lang/testimonials
+/:lang/resume
+/:lang/contact
+/:lang/terminal
+/:lang/now
+/:lang/uses
+/:lang/newsletter/confirm  /:lang/newsletter/unsubscribe
+/:lang/legal-notice        /:lang/privacy
+/:lang/preview/:token      aperçu de brouillon (non indexé)
+```
+
+Exemple : `/fr/projects/plateforme-e-commerce` et `/en/projects/e-commerce-platform`.
+
+## 21.2 ter Terminal interactif
+
+Le terminal est une **simulation contrôlée côté navigateur** : aucune commande système n'est exécutée, ni sur le serveur ni chez le visiteur. Les réponses sont construites à partir des données publiques de l'API.
+
+Commandes de départ : `help`, `whoami`, `about`, `skills`, `projects`, `experience`, `contact`, `resume`, `github`, `clear`. Le terminal gère les commandes inconnues, propose un historique (flèches haut et bas) et reste utilisable au clavier et avec un lecteur d'écran.
 
 ## 21.3 Gestion des sections
 
@@ -1121,9 +1170,13 @@ Les statuts réellement nécessaires seront définis par domaine. Il n'est pas o
 
 L'administrateur doit pouvoir vérifier le rendu d'un contenu avant sa publication, sans rendre un brouillon accessible publiquement.
 
+Décision D-09 : l'aperçu passe par un lien signé et temporaire (30 minutes) généré par l'administration, affiché par le site public sur `/:lang/preview/:token`, jamais mis en cache et jamais indexé. Détails dans l'architecture technique, section 3.8.
+
 ## 22.4 Multilingue
 
-L'architecture doit être compatible avec plusieurs langues. La stratégie de traduction devra être décidée globalement : champs traduisibles, tables de traduction ou autre approche.
+Décision validée : **français (langue par défaut) et anglais**, avec des tables de traduction `<entité>_translations` communes à tous les domaines, des URLs `/fr/...` et `/en/...`, un SEO dans les deux langues et des onglets FR/EN dans l'administration.
+
+Le changement de langue doit conserver la page consultée : chaque contenu public renvoie ses slugs dans les deux langues.
 
 Il ne faut pas créer une solution multilingue différente dans chaque domaine.
 
@@ -1141,6 +1194,14 @@ Le système de notification devra être centralisé si le besoin devient suffisa
 ## 22.6 Historique et traçabilité
 
 Les modifications sensibles doivent pouvoir être suivies. La stratégie d'audit doit être proportionnée aux besoins et éviter de conserver des données inutiles.
+
+## 22.7 Thème clair et sombre
+
+Le visiteur peut choisir entre un thème clair et un thème sombre. Par défaut, le site public est en sombre et l'administration en clair. La préférence du système d'exploitation peut être respectée. Le choix est conservé dans un cookie lu par le serveur, pour éviter un flash de mauvais thème au chargement.
+
+## 22.8 Accessibilité des expériences originales
+
+Les expériences inspirées du terminal ou fortement visuelles doivent avoir une alternative accessible (formulaire de contact classique, navigation standard). Les animations respectent la préférence `prefers-reduced-motion`.
 
 ---
 
@@ -1220,7 +1281,7 @@ La navigation publique pourra proposer les entrées suivantes :
 
 Le CV pourra être accessible depuis un bouton dédié, par exemple « Télécharger mon CV ».
 
-Un terminal interactif ou une démonstration technique pourra être proposé comme élément distinctif. Son fonctionnement et son niveau d'accès devront être conçus avec attention pour ne pas exposer le serveur ou des informations privées.
+Un terminal interactif est proposé comme élément distinctif (voir 21.2 ter). Son fonctionnement et son niveau d'accès sont conçus pour ne pas exposer le serveur ou des informations privées.
 
 Le menu ne doit pas nécessairement afficher toutes les pages. L'administrateur pourra contrôler les éléments de navigation.
 
@@ -1390,6 +1451,19 @@ La première version doit prioriser les fonctions nécessaires pour rendre la pl
 
 Les modules pourront être développés par étapes, mais leur architecture devra être cohérente dès la conception.
 
+## 28.1 bis Lots de livraison de la V1
+
+Décision D-02 (21/11/2026) : le périmètre V1 ci-dessus est conservé en entier. L'ancien découpage en phases devient l'**ordre de livraison**. Toute la base de données est créée dès le lot 1 et le bilinguisme FR/EN est présent dès le départ, car l'ajouter après coup coûterait très cher. Le site n'est mis en ligne publiquement qu'à la fin du lot 1.
+
+| Lot | Contenu | Objectif |
+|---|---|---|
+| **Lot 1 — Fondation** | Authentification et rôles, médias, profil, configuration et menus, pages et sections, technologies, compétences, services, portfolio et études de cas, parcours (expériences, formations), CV, contact (classique + terminal), SEO de base, pages légales, thème clair/sombre, FR/EN | Site professionnel complet, publiable |
+| **Lot 2 — Contenus** | Blog (catégories, tags), certifications et réalisations, chronologie, témoignages, pages Now et Uses | Présence éditoriale et crédibilité |
+| **Lot 3 — Interactif** | Laboratoire et démonstrations, terminal interactif, animations avancées | Différenciation technique |
+| **Lot 4 — Suivi** | Statistiques essentielles et tableau de bord, inscription à la newsletter (double confirmation), recherche plein texte publique | Mesure et fidélisation |
+
+L'envoi de campagnes de newsletter (`newsletter_campaigns`) est prévu dans le modèle mais développé **après la V1**.
+
 ## 28.2 Évolutions possibles
 
 Selon les besoins réels :
@@ -1489,7 +1563,7 @@ Cet inventaire sert de base à la conception détaillée. Il doit être révisé
 | 13. Communication | `messages`, `testimonials`, `newsletter_subscribers`, éventuellement `contact_requests`, `newsletter_campaigns` |
 | 14. Médias | `media`, éventuellement `media_collections` |
 | 15. CV | `resumes`, éventuellement `resume_versions` |
-| 16. Administration, sécurité et SEO | `roles`, `permissions`, `activity_logs`, `seo_metadata`, `redirects` |
+| 16. Administration, sécurité et SEO | `activity_logs`, `seo_metadata`, `redirects` (rôles par colonne `users.role`, décision D-04) |
 | 17. Analytics | `page_views`, `events` |
 | 18. Pages et sections | éventuellement `pages`, `page_sections` ou une configuration de sections |
 
@@ -1504,9 +1578,9 @@ Les relations suivantes pourront nécessiter des tables pivots :
 - expériences ↔ technologies ;
 - expérimentations ↔ technologies ;
 - articles ↔ tags ;
-- pages ↔ contenus mis en avant, si nécessaire ;
-- utilisateurs ↔ rôles ;
-- rôles ↔ permissions.
+- pages ↔ contenus mis en avant, si nécessaire.
+
+Les liaisons utilisateurs ↔ rôles et rôles ↔ permissions ne sont pas nécessaires en V1 (décision D-04).
 
 La liste définitive dépendra des cardinalités et des besoins réels.
 
@@ -1632,24 +1706,23 @@ Aucune migration ne doit être générée avant validation de la conception.
 
 # 33. Organisation documentaire recommandée
 
+Décision D-05 (21/11/2026) : une seule arborescence, décrite dans le `README.md` à la racine du dépôt, qui remplace les deux propositions précédentes.
+
 ```text
 documentation/
-├── 01-GLOBAL-SPECIFICATIONS/
-│   └── 01-general-requirements.md
+├── 00-VISION/
+│   └── cahier-des-charges-general.md        # le présent document
+├── 01-FUNCTIONAL-SPECIFICATIONS/            # une fiche par page ou module, au besoin
 ├── 02-DATABASE/
-│   ├── 01-entities.md
-│   ├── 02-relationships.md
-│   ├── 03-tables-structure.md
-│   ├── 04-columns-and-data-types.md
-│   ├── 05-constraints-and-indexes.md
-│   ├── 06-mcd.md
-│   ├── 07-mld.md
-│   ├── 08-database-diagram.md
-│   └── 09-data-dictionary.md
+│   └── structure-base-de-donnees.md
 ├── 03-TECHNICAL-ARCHITECTURE/
-├── 04-API-SPECIFICATIONS/
-├── 05-UI-UX/
-└── 06-TESTING/
+│   └── architecture-technique.md
+├── 04-API-SPECIFICATIONS/                   # généré depuis OpenAPI + conventions
+├── 05-DESIGN-SYSTEM/
+├── 06-TESTING/
+├── 07-DEPLOYMENT/
+└── 99-ARCHIVE/
+    └── cahier-des-charges-general_2026-11-14.md
 ```
 
 Les documents détaillés des domaines pourront être ajoutés plus tard si un module nécessite une spécification complémentaire. Le présent document reste la référence générale.

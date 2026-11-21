@@ -78,6 +78,7 @@ wariss-dev-api/
 
 - Colonne `role` (admin, viewer) sur `users`. Un middleware `EnsureCanWrite` refuse tout sauf GET au `viewer`, et les Policies masquent pour lui les messages, abonnés, journal d'activité, comptes et réglages sensibles.
 - L'API expose l'endpoint `me` avec le rôle ; l'admin React en déduit les boutons à masquer (confort uniquement).
+- Évolution (D-04) : comme toutes les règles d'accès sont dans les Policies, passer à des rôles et permissions en base (`spatie/laravel-permission`) ne modifiera que les Policies et le middleware, pas les contrôleurs.
 
 ### 3.5 Tâches planifiées
 
@@ -100,6 +101,18 @@ wariss-dev-api/
 - Cache Redis des réponses publiques par langue, invalidé par les Observers à chaque publication.
 - Chargement anticipé des relations (éviter les requêtes N+1), pagination partout, index déjà prévus dans le modèle.
 - Redimensionnement d'images et e-mails en file d'attente.
+
+### 3.8 Aperçu des brouillons (D-09)
+
+Objectif : voir un contenu non publié avec le vrai rendu du site public, sans jamais l'exposer.
+
+1. Dans l'admin, le bouton « Aperçu » appelle `POST /api/v1/admin/preview` avec `{ type, id, locale }` (types autorisés : pages, services, projets, études de cas, expérimentations, articles).
+2. L'API vérifie la Policy `view`, puis renvoie une URL signée par Laravel (`URL::temporarySignedRoute`) valable **30 minutes**, qui encode le type, l'identifiant et la langue.
+3. L'admin ouvre `https://wariss.dev/:lang/preview/:token` dans un nouvel onglet.
+4. Le loader serveur du site public appelle `GET /api/v1/public/preview/{token}`. L'API contrôle la signature et l'expiration, puis renvoie la ressource publique du contenu **quel que soit son statut**.
+5. Réponses : `Cache-Control: no-store`, `X-Robots-Tag: noindex, nofollow`, aucune mise en cache Redis, aucun suivi analytics, bandeau « Aperçu — non publié ».
+
+Aucune table n'est nécessaire : le lien est autonome et expire tout seul. Chaque génération d'aperçu est inscrite au journal d'activité. Le `viewer` peut générer un aperçu, car c'est une lecture.
 
 ## 4. Frontend : revue de ton document
 
@@ -225,10 +238,19 @@ Les espacements, rayons, ombres, tailles de police et transitions de ton fichier
 ### 4.6 Langues et URLs
 
 - `/` redirige vers `/fr` ou `/en` selon le cookie de langue, puis l'en-tête `Accept-Language`.
-- Routes publiques : `/:lang`, `/:lang/about`, `/:lang/services/:slug`, `/:lang/portfolio/:slug`, `/:lang/blog/:slug`, etc. Les slugs de contenu sont traduits.
+- Routes publiques (D-03) : segments en anglais identiques dans les deux langues, slugs de contenu traduits. `/:lang`, `/:lang/about`, `/:lang/skills`, `/:lang/experience`, `/:lang/projects/:slug`, `/:lang/case-studies/:slug`, `/:lang/services/:slug`, `/:lang/lab/:slug`, `/:lang/blog/:slug`, `/:lang/blog/category/:slug`, `/:lang/blog/tag/:slug`, `/:lang/achievements`, `/:lang/testimonials`, `/:lang/resume`, `/:lang/contact`, `/:lang/terminal`, `/:lang/now`, `/:lang/uses`, `/:lang/newsletter/{confirm,unsubscribe}`, `/:lang/legal-notice`, `/:lang/privacy`, `/:lang/preview/:token`. Liste de référence : cahier des charges v1.1, section 21.2 bis. Les `route_key` de `navigation_items` reprennent ces noms (`projects`, `blog`, `contact`…).
 - Chaque page contient `<link rel="alternate" hreflang>` pour les deux langues, `x-default`, une URL canonique et des balises Open Graph dans la langue de la page.
 - Textes d'interface : `packages/i18n/locales/{fr,en}`, un fichier par espace (commun, accueil, contact, admin…).
 - Dans l'admin, chaque formulaire traduisible propose des onglets FR / EN avec un indicateur des champs manquants.
+
+### 4.7 Types partagés entre l'API et le frontend (D-10)
+
+Les deux dépôts sont séparés : le contrat entre eux est le fichier OpenAPI.
+
+1. **API** : Scramble génère la documentation. La commande d'export de Scramble écrit `openapi.json` à la racine du dépôt API, et ce fichier est **versionné**. La CI de l'API régénère le fichier et échoue s'il diffère de la version committée : tout changement de contrat est donc visible dans la revue de code.
+2. **Frontend** : le script `pnpm api:types` lit le fichier depuis `OPENAPI_SOURCE`, qui vaut par défaut le chemin local `../wariss-dev-api/openapi.json` et peut aussi être une URL de préproduction. Il lance `openapi-typescript` et écrit `packages/api-client/src/schema.d.ts`, qui est **versionné**.
+3. La CI du frontend récupère `openapi.json` depuis la branche principale de l'API, régénère les types et échoue s'il y a une différence. Le build TypeScript détecte ensuite toute utilisation devenue incompatible.
+4. `packages/api-client` exporte des alias lisibles (`Project`, `Post`…) et un client typé fin. Aucun type d'API n'est écrit à la main.
 
 ## 5. Dépendances
 
@@ -314,3 +336,20 @@ PHP (version supportée la plus récente compatible avec Laravel), Composer, Nod
 - **Rendu serveur** : construire d'abord une page publique de bout en bout (liste de projets, détail, balises SEO, changement de langue) avant d'engager tout le site. Si l'hébergement d'un serveur Node pose problème, Next.js est l'alternative, au prix d'un routage différent de celui de ton document.
 - **Éditeur Markdown** de l'admin : Tiptap avec extension Markdown, ou éditeur Markdown dédié.
 - **Compatibilité** de `astrotomic/laravel-translatable` avec la version de Laravel installée.
+
+## 8. Registre des décisions
+
+Décisions prises le 21 novembre 2026 pour lever les incohérences entre documents. Toute nouvelle décision structurante est ajoutée ici avec le numéro suivant.
+
+| N° | Sujet | Décision | Raison | Documents mis à jour |
+| --- | --- | --- | --- | --- |
+| D-01 | Deux cahiers des charges | La v1 devient la v1.1, seule référence ; les éléments propres au premier document y sont fusionnés (Now, Uses, thème, terminal, contact terminal, phases). L'ancien est marqué « remplacé » et sera archivé. | Une seule source de vérité, sans perdre d'exigence | Cahier des charges v1.1, ancien cahier des charges |
+| D-02 | Périmètre V1 contradictoire | Périmètre V1 de la v1.0 conservé et livré en 4 lots (fondation, contenus, interactif, suivi). Toute la base et le FR/EN dès le lot 1. Campagnes de newsletter après la V1. | Le document le plus récent fait foi pour le périmètre ; les phases donnent l'ordre de livraison | Cahier des charges §28.1 bis |
+| D-03 | `/projects` ou `/portfolio` | `/:lang/projects/:slug` ; segments de route en anglais dans les deux langues, slugs traduits. | Cohérent avec les cahiers des charges et les `route_key` ; des segments fixes simplifient le routage, le sitemap et `hreflang` | Cahier des charges §21.2 bis, architecture §4.6 |
+| D-04 | Tables de rôles ou colonne | Colonne `users.role` (admin, viewer) en V1 ; évolution possible via les Policies. | Deux comptes prévus : des tables de permissions seraient de la complexité inutile | Cahier des charges §19.3, §19.7, §30 ; base de données ; architecture §3.4 |
+| D-05 | Arborescence de la documentation | Arborescence unique décrite dans le `README.md` racine (00-VISION à 07-DEPLOYMENT, 99-ARCHIVE). | Deux propositions concurrentes | `README.md` (ex-`documentation.md`), cahier des charges §33 |
+| D-06 | Slugs et suppression douce | Slug réservé tant que le contenu existe, même supprimé en douceur ; redirection 301 automatique si un slug publié change. | Restauration sans conflit, pas d'URL indexée réattribuée, SEO préservé | Base de données (conventions) |
+| D-07 | E-mail insensible à la casse | Minuscules à l'enregistrement + index unique `lower(email)`. Pas de `citext`. | Simple, sans extension, fiable avec Eloquent | Base de données (D1, D13, index) |
+| D-08 | Recherche FR/EN | `search_vector` générée avec la configuration `french` ou `english` selon `locale`, pondérée, sans accents via `immutable_unaccent()`. | La recherche française est fausse avec la configuration anglaise, et inversement | Base de données (conventions, index, migrations) |
+| D-09 | Aperçu des brouillons | Lien signé Laravel de 30 minutes, route `/:lang/preview/:token`, `no-store` + `noindex`, aucune table. | Exigence du cahier des charges §22.3 sans exposition publique | Architecture §3.8, cahier des charges §22.3 |
+| D-10 | Types TypeScript entre deux dépôts | `openapi.json` versionné dans l'API, types générés et versionnés dans `packages/api-client`, contrôle de différence en CI des deux côtés. | Le contrat d'API devient explicite et vérifié automatiquement | Architecture §4.7 |

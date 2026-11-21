@@ -1,0 +1,17 @@
+# Secrets et configuration locale
+.env
+.env.*
+!.env.example
+.claude/settings.local.json
+
+# Système et éditeurs
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+~$*
+
+# Outillage local de Claude Code (non versionné)
+.claude/

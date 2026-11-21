@@ -1,5 +1,7 @@
 # WARISS.DEV --- Cahier des charges général
 
+> **⚠ Document remplacé (21 novembre 2026).** La référence est désormais [`documentation/00-VISION/cahier-des-charges-general.md`](../00-VISION/cahier-des-charges-general.md) (version 1.1), qui intègre les éléments propres à ce document : pages Now et Uses, thème clair/sombre, commandes du terminal, contact de style terminal et phases de la roadmap (devenues les lots de livraison). Ce fichier est conservé pour archive. Ses routes (`/projects/:slug` sans préfixe de langue, sous-pages `/about/story`, `/skills/frontend`, `/lab/playground`…) ne sont plus à jour : voir la section 21.2 bis de la v1.1.
+
 ## Document fondateur du projet
 
 **Version :** 1.0\
