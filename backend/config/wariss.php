@@ -39,4 +39,27 @@ return [
         'analytics_raw_days' => 90,
     ],
 
+    /*
+    | Téléversements de la bibliothèque de médias (D14).
+    |
+    | Liste blanche : extension => types MIME réels acceptés (lus dans le contenu du fichier,
+    | pas dans le nom), nature du média et taille maximale en kilo-octets. Le SVG est exclu
+    | (il peut contenir du script) : les icônes passent par icon_key.
+    | Les images sont ré-encodées : orientation appliquée, données EXIF (GPS, appareil) retirées.
+    */
+    'uploads' => [
+        'types' => [
+            'jpg' => ['mimes' => ['image/jpeg'], 'kind' => 'image', 'max_kb' => 10_240],
+            'jpeg' => ['mimes' => ['image/jpeg'], 'kind' => 'image', 'max_kb' => 10_240],
+            'png' => ['mimes' => ['image/png'], 'kind' => 'image', 'max_kb' => 10_240],
+            'webp' => ['mimes' => ['image/webp'], 'kind' => 'image', 'max_kb' => 10_240],
+            'pdf' => ['mimes' => ['application/pdf'], 'kind' => 'document', 'max_kb' => 20_480],
+            'mp4' => ['mimes' => ['video/mp4'], 'kind' => 'video', 'max_kb' => 102_400],
+            'webm' => ['mimes' => ['video/webm'], 'kind' => 'video', 'max_kb' => 102_400],
+        ],
+        'image_quality' => 85,
+        'max_image_pixels' => 40_000_000,
+        'directory' => 'media',
+    ],
+
 ];
