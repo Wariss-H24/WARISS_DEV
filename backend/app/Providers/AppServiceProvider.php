@@ -3,17 +3,41 @@
 namespace App\Providers;
 
 use App\Models\Blog\Post;
+use App\Models\Blog\PostCategory;
+use App\Models\Blog\Tag;
 use App\Models\Career\Achievement;
 use App\Models\Career\Certification;
 use App\Models\Career\Education;
 use App\Models\Career\Experience;
+use App\Models\Career\TimelineEvent;
 use App\Models\Catalog\Skill;
+use App\Models\Catalog\SkillCategory;
+use App\Models\Catalog\Technology;
+use App\Models\Catalog\TechnologyCategory;
+use App\Models\Communication\Message;
+use App\Models\Communication\NewsletterCampaign;
+use App\Models\Communication\NewsletterSubscriber;
+use App\Models\Communication\Testimonial;
+use App\Models\Identity\Profile;
+use App\Models\Identity\SocialLink;
 use App\Models\Lab\Experiment;
+use App\Models\Lab\ExperimentCategory;
 use App\Models\Media\Media;
+use App\Models\Media\MediaCollection;
 use App\Models\Pages\Page;
+use App\Models\Pages\PageSection;
 use App\Models\Portfolio\CaseStudy;
 use App\Models\Portfolio\Project;
+use App\Models\Portfolio\ProjectCategory;
+use App\Models\Resume\Resume;
+use App\Models\Resume\ResumeVersion;
+use App\Models\Seo\Redirect;
+use App\Models\Seo\SeoMetadata;
 use App\Models\Services\Service;
+use App\Models\Services\ServiceCategory;
+use App\Models\Settings\NavigationItem;
+use App\Models\Settings\NavigationMenu;
+use App\Models\Settings\SiteSetting;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -93,6 +117,31 @@ class AppServiceProvider extends ServiceProvider
             'education' => Education::class,
             'certification' => Certification::class,
             'achievement' => Achievement::class,
+            // Contenus de l'administration, référencés par le journal d'activité.
+            'technology_category' => TechnologyCategory::class,
+            'technology' => Technology::class,
+            'skill_category' => SkillCategory::class,
+            'project_category' => ProjectCategory::class,
+            'service_category' => ServiceCategory::class,
+            'experiment_category' => ExperimentCategory::class,
+            'post_category' => PostCategory::class,
+            'tag' => Tag::class,
+            'timeline_event' => TimelineEvent::class,
+            'testimonial' => Testimonial::class,
+            'message' => Message::class,
+            'newsletter_subscriber' => NewsletterSubscriber::class,
+            'newsletter_campaign' => NewsletterCampaign::class,
+            'page_section' => PageSection::class,
+            'navigation_menu' => NavigationMenu::class,
+            'navigation_item' => NavigationItem::class,
+            'site_setting' => SiteSetting::class,
+            'profile' => Profile::class,
+            'social_link' => SocialLink::class,
+            'media_collection' => MediaCollection::class,
+            'redirect' => Redirect::class,
+            'seo_metadata' => SeoMetadata::class,
+            'resume' => Resume::class,
+            'resume_version' => ResumeVersion::class,
         ]);
     }
 
