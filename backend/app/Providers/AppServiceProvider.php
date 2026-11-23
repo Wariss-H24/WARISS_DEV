@@ -15,7 +15,10 @@ use App\Models\Portfolio\CaseStudy;
 use App\Models\Portfolio\Project;
 use App\Models\Services\Service;
 use App\Models\User;
+use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -49,6 +52,22 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->configurePasswordPolicy();
         $this->configureMorphMap();
+        $this->configureRateLimiting();
+    }
+
+    /**
+     * Limites de requêtes par adresse IP (protection contre les abus et le spam).
+     *
+     * public-read : lecture des contenus ; public-forms : contact et newsletter ;
+     * tracking : mesure d'audience ; auth : tentatives de connexion (en plus de la limite
+     * par adresse e-mail appliquée dans LoginRequest).
+     */
+    protected function configureRateLimiting(): void
+    {
+        RateLimiter::for('public-read', fn (Request $request): Limit => Limit::perMinute(120)->by((string) $request->ip()));
+        RateLimiter::for('public-forms', fn (Request $request): Limit => Limit::perMinute(5)->by((string) $request->ip()));
+        RateLimiter::for('tracking', fn (Request $request): Limit => Limit::perMinute(60)->by((string) $request->ip()));
+        RateLimiter::for('auth', fn (Request $request): Limit => Limit::perMinute(20)->by((string) $request->ip()));
     }
 
     /**
