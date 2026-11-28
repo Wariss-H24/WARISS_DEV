@@ -89,7 +89,11 @@ jobs:
       - name: Tests (Pest)
         run: php artisan test
 
+      # Scramble lit le schéma des tables pour typer les modèles : il lui faut une base migrée.
       - name: Contrat OpenAPI à jour (openapi.json)
+        env:
+          DB_DATABASE: wariss_dev_test
         run: |
+          php artisan migrate --force --no-interaction
           php artisan scramble:export
           git diff --exit-code -- openapi.json || { echo "::error::openapi.json n'est plus à jour : lancez « php artisan scramble:export » et committez le fichier."; exit 1; }
