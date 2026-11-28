@@ -18,6 +18,7 @@ use App\Http\Controllers\Api\V1\Admin\Identity\SocialLinkController;
 use App\Http\Controllers\Api\V1\Admin\Lab\ExperimentCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Lab\ExperimentController;
 use App\Http\Controllers\Api\V1\Admin\Media\MediaCollectionController;
+use App\Http\Controllers\Api\V1\Admin\Media\MediaController;
 use App\Http\Controllers\Api\V1\Admin\Pages\PageController;
 use App\Http\Controllers\Api\V1\Admin\Pages\PageSectionController;
 use App\Http\Controllers\Api\V1\Admin\Portfolio\CaseStudyController;
@@ -97,5 +98,7 @@ $crud('social-links', SocialLinkController::class);
 
 // Médias, SEO, CV (D14, D15, D16)
 $crud('media-collections', MediaCollectionController::class);
+$crud('media', MediaController::class);
+Route::get('media/{id}/file', [MediaController::class, 'file'])->whereNumber('id')->name('media.file');
 $crud('redirects', RedirectController::class);
 $crud('resumes', ResumeController::class);

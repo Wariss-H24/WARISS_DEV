@@ -79,7 +79,6 @@ class MediaStorage
                     'kind' => $kind ?? MediaKind::from($type['kind']),
                     'visibility' => $visibility,
                     'uploaded_by' => $uploader?->getKey(),
-                    'metadata' => [],
                 ]);
 
                 foreach ($attributes['translations'] ?? [] as $locale => $translation) {

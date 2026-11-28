@@ -78,7 +78,7 @@ Résumé des décisions clés :
 
 ## 4. Ce qui est FAIT (commité, poussé, CI verte)
 
-Dernier commit : `1f58fa4 feat(api): CRUD d'administration de tous les contenus éditoriaux`. **462 tests réussis**, Larastan et Pint propres, badge de la CI `passing`.
+Dernier commit : `feat(api): bibliothèque de médias`. **482 tests réussis**, Larastan et Pint propres.
 
 ### 4.1 Base de données : complète, 86 tables
 Tous les domaines D1 à D18 :
@@ -144,103 +144,49 @@ Conventions des migrations et des modèles :
   - Chronologie : la source doit exister et être du même type.
 - Tests : `tests/Feature/Api/Admin/AdminCrudTest.php` (47) et `AdminDomainRulesTest.php` (17).
 
-## 5. EN COURS : bibliothèque de médias (D14), NON COMMITÉ
+### 4.4 Bibliothèque de médias (D14) : FAITE
 
-> ⚠️ Ces fichiers n'existent **que sur l'ancien poste** tant qu'ils ne sont pas commités et poussés. S'ils manquent sur le nouveau poste, réécris-les en suivant cette description.
+Commit `feat(api): bibliothèque de médias`, 482 tests.
 
-**Fichiers écrits, pas encore testés :**
+- `config/wariss.php`, section `uploads` : liste blanche des extensions avec leurs types MIME réels, nature et taille maximale (jpg, jpeg, png et webp jusqu'à 10 Mo ; pdf jusqu'à 20 Mo ; mp4 et webm jusqu'à 100 Mo), plus `image_quality`, `max_image_pixels` et `directory`. **Le SVG est exclu** car il peut contenir du script ; les icônes passent par `icon_key`.
+- `App\Services\Media\MediaStorage` :
+  - nom en UUID, chemin `media/Y/m/<uuid>.<ext>` ;
+  - disque `public` ou disque privé `local` (D-13) ;
+  - **images ré-encodées par GD** : orientation appliquée, EXIF retiré ;
+  - empreinte SHA-256 du fichier d'origine ;
+  - `changeVisibility` déplace le fichier d'un disque à l'autre ;
+  - `url()` renvoie l'URL externe, l'URL publique ou la route `admin.media.file`.
+- `App\Services\Media\MediaUsages` : recense les usages d'un média à partir des clés étrangères lues dans `pg_constraint`. Un usage est `blocking` si sa règle est RESTRICT : c'est le cas de `mediables` (galeries) et de `resume_versions`. Les autres clés sont en SET NULL.
+- `AdminCrudController` gagne le point d'extension `resourceClass()` et la méthode `resource()`. `deleteOrConflict`, `deleted` et `validated` sont maintenant `protected`.
+- `MediaResource` (hérite d'`AdminResource`) ajoute `url`, et `usages` dans le détail grâce à `withUsages()`.
+- `MediaRequest` :
+  - **création** : soit `file` (multipart), soit `external_url` (https et `kind` obligatoires) ;
+  - **contrôle du contenu réel du fichier** : extension, type MIME lu par finfo, taille, nombre de pixels ;
+  - `kind` doit correspondre au fichier, avec image ↔ `icon` autorisé ;
+  - **modification** : `file` interdit, `external_url` modifiable seulement pour un média externe.
+- `MediaController`, routes `admin.media.*` et `GET media/{id}/file` :
+  - doublon → 409 avec `existing_id`, sauf `allow_duplicate` ;
+  - suppression d'un média utilisé → 409 avec `usages` et `requires_confirmation` ; `?confirm=1` vide les emplacements ;
+  - un usage bloquant renvoie toujours 409 ;
+  - fichier servi avec `nosniff` et `Cache-Control: private, no-store`.
+- Tests : `tests/Feature/Api/Admin/AdminMediaTest.php` (20).
 
-1. `backend/config/wariss.php`, nouvelle section `uploads` :
-   ```php
-   'uploads' => [
-       'types' => [ // extension => types MIME réels acceptés, nature, taille max en Ko
-           'jpg'  => ['mimes' => ['image/jpeg'], 'kind' => 'image', 'max_kb' => 10_240],
-           'jpeg' => ['mimes' => ['image/jpeg'], 'kind' => 'image', 'max_kb' => 10_240],
-           'png'  => ['mimes' => ['image/png'],  'kind' => 'image', 'max_kb' => 10_240],
-           'webp' => ['mimes' => ['image/webp'], 'kind' => 'image', 'max_kb' => 10_240],
-           'pdf'  => ['mimes' => ['application/pdf'], 'kind' => 'document', 'max_kb' => 20_480],
-           'mp4'  => ['mimes' => ['video/mp4'],  'kind' => 'video', 'max_kb' => 102_400],
-           'webm' => ['mimes' => ['video/webm'], 'kind' => 'video', 'max_kb' => 102_400],
-       ],
-       'image_quality' => 85,
-       'max_image_pixels' => 40_000_000,
-       'directory' => 'media',
-   ],
-   ```
-   Le SVG est exclu, car il peut contenir du script ; les icônes passent par `icon_key`.
+## 5. CE QUI RESTE À FAIRE (par ordre)
 
-2. `backend/app/Services/Media/MediaStorage.php` :
-   - `checksum(UploadedFile)` : SHA-256 du fichier d'origine, pour détecter les doublons.
-   - `store(UploadedFile, MediaVisibility, ?MediaKind, array $attributes, ?User $uploader): Media` :
-     - nom en UUID, chemin `media/Y/m/<uuid>.<ext>` ;
-     - disque `public` si le média est public, `local` (privé, `storage/app/private`) sinon ;
-     - **images ré-encodées par GD** : orientation appliquée, EXIF retiré. Appel : `ImageManager::usingDriver(GdDriver::class, autoOrientation: true, strip: true)->decodePath()`, puis `->encode(new JpegEncoder(quality:, progressive: true, strip: true))->toString()`, avec `PngEncoder` ou `WebpEncoder` selon l'extension ;
-     - `forceFill` des champs techniques (disk, path, original_name, stored_name, mime_type, extension, size_bytes, checksum_sha256, width, height, kind, visibility, uploaded_by, metadata) ;
-     - traductions `alt_text`, `caption` et `description` ;
-     - le fichier est supprimé si l'insertion échoue.
-   - `changeVisibility(Media, MediaVisibility)` : déplace le fichier d'un disque à l'autre.
-   - `deleteFile(Media)`.
-   - `url(Media)` : URL externe, URL publique, ou route `admin.media.file` pour un fichier privé. **Cette route n'existe pas encore.**
-   - `diskFor(MediaVisibility)`.
-
-3. `backend/app/Services/Media/MediaUsages.php` : `for(Media)` lit dans `pg_constraint` toutes les clés étrangères vers `media`, sauf `media_translations`.
-   - Pour chaque usage, il renvoie `table`, `column`, `ids` (20 au plus ; `mediable_id` pour la table `mediables`), `count` et `blocking`.
-   - `blocking` vaut vrai pour les règles RESTRICT ou NO ACTION, par exemple `mediables`. SET NULL ou CASCADE ne bloquent pas.
-
-**Contexte du modèle `App\Models\Media\Media`** :
-- `fillable` : `media_collection_id`, `kind`, `visibility`, `external_url`, `credit` ;
-- champs traduits : `alt_text`, `caption`, `description` ;
-- `isExternal()` ;
-- contrainte `media_source_check` : soit un fichier (tous les champs techniques remplis), soit une `external_url` sans aucun champ de fichier ;
-- `unique(disk, path)` ;
-- visibilité `private` par défaut ;
-- fabrique avec les états `privateDocument()` et `externalVideo()`.
-
-**Ce qui reste pour les médias (conception prévue) :**
-- Dans `AdminCrudController`, ajouter un point d'extension `resourceClass()` (`AdminResource` par défaut), utilisé par index, show, store, update et restore. Passer `deleteOrConflict`, `deleted` et `validated` en `protected`.
-- `MediaResource` : le contenu d'`AdminResource::payload()`, plus `url`, plus `usages` dans le détail.
-- `MediaController` (`Admin/Media/`), qui hérite du socle CRUD :
-  - **Liste** : filtres `kind`, `visibility`, `media_collection_id` et recherche sur `original_name` ; tris `id`, `created_at`, `size_bytes`.
-  - **Création** (multipart), deux cas exclusifs :
-    - `file` : contrôles de l'extension en liste blanche, du **type MIME réel** (finfo) dans les mimes autorisés, de la taille (`max_kb`), et pour une image de largeur × hauteur ≤ `max_image_pixels`. `kind` vient du type (image peut être déclarée `icon`). **Doublon** : même checksum → 409 avec l'id du média existant, sauf si `allow_duplicate=true`. Le journal d'activité reçoit `Created`.
-    - `external_url` : https obligatoire, `kind` obligatoire, `duration_seconds` facultatif ; création par `SaveModel`.
-    - Champs communs : `visibility` (par défaut `private`), `media_collection_id`, `credit`, traductions facultatives.
-  - **Modification** :
-    - métadonnées et traductions par `SaveModel`, sans `visibility` ;
-    - si `visibility` change, appel à `MediaStorage::changeVisibility` ;
-    - `external_url` et `kind` modifiables seulement pour un média externe (image ↔ icon autorisé pour un fichier).
-  - **Suppression** :
-    - si un usage bloque → toujours 409 avec la liste des usages ;
-    - si des usages existent sans `?confirm=1` → 409 avec la liste ;
-    - sinon : suppression en transaction, puis suppression du fichier, puis journal.
-  - **`GET media/{id}/file`**, nommée `admin.media.file` : sert le fichier (privé ou public) avec `X-Content-Type-Options: nosniff` et un `Content-Disposition` qui reprend `original_name`. 404 pour un média externe. Le `viewer` peut lire.
-- Routes dans `admin.php` : `$crud('media', MediaController::class)`, puis la route `file`.
-- Tests avec `Storage::fake('public')`, `Storage::fake('local')` et `UploadedFile::fake()->image(...)` :
-  - EXIF retiré ;
-  - type refusé (SVG, faux PNG) ;
-  - doublon ;
-  - changement de visibilité qui déplace le fichier ;
-  - suppression bloquée ou confirmée ;
-  - fichier privé servi ;
-  - `viewer` refusé en écriture.
-
-## 6. CE QUI RESTE À FAIRE (par ordre)
-
-1. **Terminer les médias** (section 5), commit `feat(api): bibliothèque de médias`.
-2. **Versions de CV** : téléversement d'un PDF par `MediaStorage`, en privé ou en public selon le cas.
-3. **Profil** : ressource unique (GET et PATCH, pas de liste).
-4. **Réglages** :
+1. **Versions de CV** : téléversement d'un PDF par `MediaStorage`, en privé ou en public selon le cas.
+2. **Profil** : ressource unique (GET et PATCH, pas de liste).
+3. **Réglages** :
    - le `viewer` ne voit que les réglages publics ;
    - mise à jour par lot ;
    - `social-links` est déjà fait.
-5. **Données sensibles** derrière la gate `view-sensitive-data` :
+4. **Données sensibles** derrière la gate `view-sensitive-data` :
    - messages de contact : lecture, statut, suppression ;
    - abonnés à la newsletter ;
    - journal d'activité en lecture seule ;
    - comptes.
-6. **SEO par contenu** (`seo_metadata`, polymorphe) ; **aperçu des brouillons** par URL signée de 30 minutes.
-7. **Tableau de bord et statistiques** : compteurs, visites, partages, sources.
-8. **API publique** (`routes/api/v1/public.php`), avec des ressources publiques séparées et seulement les contenus publiés et visibles :
+5. **SEO par contenu** (`seo_metadata`, polymorphe) ; **aperçu des brouillons** par URL signée de 30 minutes.
+6. **Tableau de bord et statistiques** : compteurs, visites, partages, sources.
+7. **API publique** (`routes/api/v1/public.php`), avec des ressources publiques séparées et seulement les contenus publiés et visibles :
    - profil, pages, sections, menus, projets, études de cas, services, laboratoire, articles, parcours, témoignages approuvés ;
    - recherche plein texte ;
    - téléchargement du CV ;
@@ -248,15 +194,15 @@ Conventions des migrations et des modèles :
    - **newsletter** : double opt-in par e-mail, désinscription par jeton ;
    - **mesure d'audience** : `page_views` et événements `share`, empreinte de session = sel quotidien + IP + UA, **jamais l'IP stockée** ;
    - résolution des redirections, sitemap.
-9. **Commandes planifiées** : `content:publish-scheduled` (chaque minute) et `analytics:aggregate` (chaque jour).
-10. **Messages de validation en français** (`lang/fr`). Aujourd'hui, par exemple, « The consent given field must be accepted. » s'affiche encore en anglais.
-11. **Documentation OpenAPI** avec Scramble : `openapi.json` commité.
-12. **Documentation** :
+8. **Commandes planifiées** : `content:publish-scheduled` (chaque minute) et `analytics:aggregate` (chaque jour).
+9. **Messages de validation en français** (`lang/fr`). Aujourd'hui, par exemple, « The consent given field must be accepted. » s'affiche encore en anglais.
+10. **Documentation OpenAPI** avec Scramble : `openapi.json` commité.
+11. **Documentation** :
     - décision D-19 (conventions de l'API : erreurs 409 et 422, pagination, format des traductions, médias) dans le registre de l'architecture ;
     - mise à jour de `documentation/04-API-SPECIFICATIONS/`.
-13. Ensuite viendra le **frontend** (`frontend/`), à faire uniquement quand l'utilisateur le demandera.
+12. Ensuite viendra le **frontend** (`frontend/`), à faire uniquement quand l'utilisateur le demandera.
 
-## 7. Commandes utiles (depuis `backend/`)
+## 6. Commandes utiles (depuis `backend/`)
 
 ```bash
 php artisan test --compact                   # toute la suite Pest

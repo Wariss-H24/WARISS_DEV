@@ -17,6 +17,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use LogicException;
@@ -106,6 +107,23 @@ abstract class AdminCrudController extends Controller
         return '-id';
     }
 
+    /**
+     * Ressource JSON qui représente le contenu (AdminResource par défaut).
+     *
+     * @return class-string<AdminResource>
+     */
+    protected function resourceClass(): string
+    {
+        return AdminResource::class;
+    }
+
+    protected function resource(Model $model): JsonResource
+    {
+        $resourceClass = $this->resourceClass();
+
+        return new $resourceClass($model);
+    }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = QueryBuilder::for($this->baseQuery(), $request)
@@ -115,12 +133,12 @@ abstract class AdminCrudController extends Controller
 
         $perPage = min(max($request->integer('per_page', 20), 1), self::MAX_PER_PAGE);
 
-        return AdminResource::collection($query->paginate($perPage)->withQueryString());
+        return $this->resourceClass()::collection($query->paginate($perPage)->withQueryString());
     }
 
-    public function show(int $id): AdminResource
+    public function show(int $id): JsonResource
     {
-        return new AdminResource($this->find($id)->load($this->detailRelations()));
+        return $this->resource($this->find($id)->load($this->detailRelations()));
     }
 
     public function store(SaveModel $saveModel): JsonResponse
@@ -130,18 +148,18 @@ abstract class AdminCrudController extends Controller
 
         $model = $saveModel->handle(new $modelClass, $data, $this->relations(), $this->children(), $this->beforeSave(...));
 
-        return (new AdminResource($this->find((int) $model->getKey())->load($this->detailRelations())))
+        return $this->resource($this->find((int) $model->getKey())->load($this->detailRelations()))
             ->response()
             ->setStatusCode(Response::HTTP_CREATED);
     }
 
-    public function update(int $id, SaveModel $saveModel): AdminResource
+    public function update(int $id, SaveModel $saveModel): JsonResource
     {
         $data = $this->validated();
 
         $saveModel->handle($this->find($id), $data, $this->relations(), $this->children(), $this->beforeSave(...));
 
-        return new AdminResource($this->find($id)->load($this->detailRelations()));
+        return $this->resource($this->find($id)->load($this->detailRelations()));
     }
 
     public function destroy(int $id, ActivityLogger $activityLogger): Response|JsonResponse
@@ -155,7 +173,7 @@ abstract class AdminCrudController extends Controller
     /**
      * Restaure un contenu supprimé en douceur ; 404 pour un type sans corbeille.
      */
-    public function restore(int $id, ActivityLogger $activityLogger): AdminResource
+    public function restore(int $id, ActivityLogger $activityLogger): JsonResource
     {
         $model = $this->find($id);
         abort_unless($this->usesSoftDeletes() && method_exists($model, 'restore'), Response::HTTP_NOT_FOUND);
@@ -163,7 +181,7 @@ abstract class AdminCrudController extends Controller
         $model->restore();
         $activityLogger->log(ActivityEvent::Updated, $model, ['deleted_at']);
 
-        return new AdminResource($this->find($id)->load($this->detailRelations()));
+        return $this->resource($this->find($id)->load($this->detailRelations()));
     }
 
     /**
@@ -186,7 +204,7 @@ abstract class AdminCrudController extends Controller
      *
      * @param  callable(): mixed  $delete
      */
-    private function deleteOrConflict(callable $delete): ?JsonResponse
+    protected function deleteOrConflict(callable $delete): ?JsonResponse
     {
         try {
             DB::transaction($delete(...));
@@ -211,7 +229,7 @@ abstract class AdminCrudController extends Controller
         return in_array(SoftDeletes::class, class_uses_recursive($this->model()), true);
     }
 
-    private function deleted(Model $model, ActivityLogger $activityLogger, ?string $description): Response
+    protected function deleted(Model $model, ActivityLogger $activityLogger, ?string $description): Response
     {
         $activityLogger->log(ActivityEvent::Deleted, $model, description: $description);
 
@@ -254,7 +272,7 @@ abstract class AdminCrudController extends Controller
     /**
      * @return array<string, mixed>
      */
-    private function validated(): array
+    protected function validated(): array
     {
         /** @var AdminFormRequest $request */
         $request = app($this->formRequest());
