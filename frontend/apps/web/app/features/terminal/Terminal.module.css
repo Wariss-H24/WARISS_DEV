@@ -1,0 +1,134 @@
+.terminal {
+  border: 1px solid var(--ink-600);
+  border-radius: var(--radius-lg);
+  background: var(--ink-950);
+  color: var(--slate-50);
+  font-family: var(--font-mono);
+  font-size: var(--text-sm);
+  box-shadow: var(--shadow-lg), var(--glow-accent);
+  overflow: hidden;
+  cursor: text;
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid rgb(148 163 184 / 12%);
+  background: rgb(255 255 255 / 3%);
+  color: var(--slate-450);
+  font-size: var(--text-xs);
+}
+
+.dots {
+  display: flex;
+  gap: 6px;
+}
+
+.dots span {
+  width: 11px;
+  height: 11px;
+  border-radius: var(--radius-full);
+  background: #ff5f57;
+}
+
+.dots span:nth-child(2) {
+  background: #febc2e;
+}
+
+.dots span:nth-child(3) {
+  background: #28c840;
+}
+
+.screen {
+  height: min(65vh, 34rem);
+  padding: var(--space-5);
+  overflow-y: auto;
+  line-height: 1.7;
+}
+
+.log {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.entry {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.output {
+  color: var(--slate-400);
+  white-space: pre-wrap;
+}
+
+.output a {
+  color: var(--blue-400);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.prompt {
+  flex-shrink: 0;
+  color: var(--teal-400);
+}
+
+.inputLine {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-top: var(--space-3);
+}
+
+.input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: var(--slate-50);
+  font: inherit;
+  caret-color: var(--teal-400);
+  outline: none;
+}
+
+.help {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.help div {
+  display: grid;
+  grid-template-columns: 7rem 1fr;
+  gap: var(--space-4);
+}
+
+.help dt,
+.accent {
+  color: var(--blue-400);
+}
+
+.muted {
+  color: var(--slate-450);
+}
+
+.error {
+  color: var(--red-400);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  padding: 0;
+  list-style: none;
+}
+
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2) var(--space-4);
+  color: var(--blue-400);
+}

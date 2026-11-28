@@ -1,0 +1,91 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  background: var(--color-overlay);
+  backdrop-filter: blur(6px);
+  animation: fade-in var(--duration-enter) var(--ease-out);
+}
+
+.content {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  z-index: var(--z-modal);
+  width: min(92vw, 34rem);
+  max-height: 85dvh;
+  overflow: auto;
+  padding: var(--space-6);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: var(--shadow-lg);
+  transform: translate(-50%, -50%);
+  animation: pop-in var(--duration-enter) var(--ease-out);
+}
+
+.content:focus-visible {
+  outline: none;
+}
+
+.title {
+  font-size: var(--text-xl);
+}
+
+.description {
+  margin-top: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.close {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+}
+
+.sheet {
+  position: fixed;
+  inset-block: 0;
+  right: 0;
+  z-index: var(--z-modal);
+  display: flex;
+  flex-direction: column;
+  width: min(88vw, 22rem);
+  padding: var(--space-6);
+  border-left: 1px solid var(--color-border-strong);
+  background: var(--color-bg);
+  box-shadow: var(--shadow-lg);
+  animation: slide-in var(--duration-enter) var(--ease-out);
+}
+
+.tooltip {
+  z-index: var(--z-toast);
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-xs);
+  background: var(--color-surface-raised);
+  color: var(--color-text);
+  font-size: var(--text-xs);
+  box-shadow: var(--shadow-md);
+  animation: fade-in var(--duration-state) var(--ease-out);
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+@keyframes pop-in {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -48%) scale(0.97);
+  }
+}
+
+@keyframes slide-in {
+  from {
+    transform: translateX(100%);
+  }
+}

@@ -1,0 +1,68 @@
+name: Frontend
+
+# Vérifie le frontend à chaque push et pull request qui le concerne (ou qui change le contrat d'API) :
+# types générés à jour, lint (ESLint, Stylelint, Prettier), TypeScript et build du site public.
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'frontend/**'
+      - 'backend/openapi.json'
+      - '.github/workflows/frontend.yml'
+  pull_request:
+    paths:
+      - 'frontend/**'
+      - 'backend/openapi.json'
+      - '.github/workflows/frontend.yml'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: frontend-${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    working-directory: frontend
+
+jobs:
+  quality:
+    name: Types, lint et build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Récupérer le code
+        uses: actions/checkout@v4
+
+      - name: Installer pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Installer Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Installer les dépendances
+        run: pnpm install --frozen-lockfile
+
+      - name: Types de l'API à jour (schema.d.ts)
+        run: |
+          pnpm api:types
+          git diff --exit-code -- packages/api-client/src/schema.d.ts || { echo "::error::schema.d.ts n'est plus à jour : lancez « pnpm api:types » et committez le fichier."; exit 1; }
+
+      - name: Lint (ESLint, Stylelint, Prettier)
+        run: |
+          pnpm exec eslint .
+          pnpm exec stylelint "**/*.css"
+          pnpm format:check
+
+      - name: TypeScript
+        run: pnpm typecheck
+
+      - name: Build du site public
+        run: pnpm --filter @wariss/web build

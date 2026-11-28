@@ -1,0 +1,70 @@
+.list {
+  display: grid;
+  gap: var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.card {
+  height: 100%;
+  gap: var(--space-5);
+}
+
+.icon {
+  color: var(--color-accent-text);
+}
+
+.quote {
+  font-size: var(--text-lg);
+  line-height: 1.6;
+}
+
+.author {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-top: auto;
+}
+
+.photo,
+.initial {
+  width: 2.75rem;
+  height: 2.75rem;
+  border-radius: var(--radius-full);
+  object-fit: cover;
+}
+
+.initial {
+  display: grid;
+  place-items: center;
+  background: var(--gradient-brand);
+  color: var(--color-on-accent);
+  font-family: var(--font-display);
+  font-weight: var(--weight-bold);
+}
+
+.author figcaption {
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: var(--weight-semibold);
+}
+
+.role {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+@media (width >= 768px) {
+  .list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1280px) {
+  .list {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

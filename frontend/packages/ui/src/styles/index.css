@@ -1,0 +1,8 @@
+/*
+ * Point d'entrée des styles du design system : primitives, thèmes, base, utilitaires.
+ * Les polices (Fontsource) sont importées par chaque application.
+ */
+@import './tokens.css';
+@import './themes.css';
+@import './base.css';
+@import './utilities.css';

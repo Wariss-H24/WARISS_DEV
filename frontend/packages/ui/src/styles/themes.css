@@ -1,0 +1,87 @@
+/*
+ * Variables sémantiques : seules variables utilisées par les composants.
+ * Thème posé par data-theme sur <html> : sombre par défaut sur le site, clair dans l'administration.
+ * Contrastes vérifiés : design-system.md §3.3.
+ */
+:root,
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: var(--ink-950);
+  --color-bg-alt: var(--ink-900);
+  --color-surface: var(--ink-850);
+  --color-surface-raised: var(--ink-800);
+  --color-surface-hover: #182036;
+  --color-overlay: rgb(3 6 14 / 72%);
+  --color-glass: rgb(7 11 22 / 68%);
+  --color-border: var(--ink-700);
+  --color-border-strong: var(--ink-600);
+  --color-text: var(--slate-50);
+  --color-text-muted: var(--slate-400);
+  --color-text-subtle: var(--slate-450);
+  --color-accent: var(--blue-500);
+  --color-accent-hover: var(--blue-400);
+  --color-accent-text: var(--blue-500);
+  --color-accent-soft: rgb(91 140 255 / 14%);
+  --color-on-accent: var(--ink-950);
+  --color-highlight: var(--teal-400);
+  --color-highlight-soft: rgb(53 214 197 / 12%);
+  --color-danger: var(--red-400);
+  --color-danger-soft: rgb(248 113 113 / 12%);
+  --color-success: var(--green-400);
+  --color-success-soft: rgb(52 211 153 / 12%);
+  --color-warning: var(--amber-400);
+  --color-warning-soft: rgb(251 191 36 / 12%);
+  --color-focus: rgb(91 140 255 / 55%);
+  --gradient-brand: linear-gradient(120deg, var(--blue-500) 0%, var(--teal-400) 100%);
+  --gradient-text: linear-gradient(110deg, #9bbcff 0%, var(--blue-500) 35%, var(--teal-400) 100%);
+  --glow-accent: 0 0 0 1px rgb(91 140 255 / 30%), 0 8px 40px -8px rgb(91 140 255 / 45%);
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 40%);
+  --shadow-md: 0 8px 24px -6px rgb(0 0 0 / 55%);
+  --shadow-lg: 0 24px 60px -12px rgb(0 0 0 / 65%);
+  --aurora-1: rgb(61 111 240 / 38%);
+  --aurora-2: rgb(53 214 197 / 22%);
+  --grid-line: rgb(148 163 184 / 7%);
+  --spotlight: rgb(91 140 255 / 16%);
+}
+
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-bg: var(--cloud-50);
+  --color-bg-alt: var(--cloud-100);
+  --color-surface: var(--snow);
+  --color-surface-raised: var(--snow);
+  --color-surface-hover: var(--cloud-50);
+  --color-overlay: rgb(15 23 42 / 45%);
+  --color-glass: rgb(245 247 251 / 78%);
+  --color-border: var(--cloud-200);
+  --color-border-strong: var(--cloud-300);
+  --color-text: var(--slate-900);
+  --color-text-muted: var(--slate-600);
+  --color-text-subtle: var(--slate-500);
+  --color-accent: var(--blue-700);
+  --color-accent-hover: var(--blue-800);
+  --color-accent-text: var(--blue-700);
+  --color-accent-soft: rgb(43 91 217 / 9%);
+  --color-on-accent: var(--snow);
+  --color-highlight: var(--teal-800);
+  --color-highlight-soft: rgb(11 125 114 / 9%);
+  --color-danger: var(--red-700);
+  --color-danger-soft: rgb(194 40 59 / 8%);
+  --color-success: var(--green-700);
+  --color-success-soft: rgb(11 122 75 / 8%);
+  --color-warning: var(--amber-700);
+  --color-warning-soft: rgb(154 91 0 / 9%);
+  --color-focus: rgb(43 91 217 / 45%);
+  --gradient-brand: linear-gradient(120deg, var(--blue-700) 0%, var(--teal-800) 100%);
+  --gradient-text: linear-gradient(110deg, var(--blue-800) 0%, var(--blue-700) 40%, var(--teal-800) 100%);
+  --glow-accent: 0 0 0 1px rgb(43 91 217 / 22%), 0 10px 30px -10px rgb(43 91 217 / 35%);
+  --shadow-sm: 0 1px 2px rgb(15 23 42 / 6%), 0 1px 1px rgb(15 23 42 / 4%);
+  --shadow-md: 0 4px 6px -2px rgb(15 23 42 / 6%), 0 12px 24px -8px rgb(15 23 42 / 12%);
+  --shadow-lg: 0 12px 24px -8px rgb(15 23 42 / 10%), 0 32px 64px -16px rgb(15 23 42 / 18%);
+  --aurora-1: rgb(43 91 217 / 16%);
+  --aurora-2: rgb(11 125 114 / 12%);
+  --grid-line: rgb(15 23 42 / 5%);
+  --spotlight: rgb(43 91 217 / 8%);
+}

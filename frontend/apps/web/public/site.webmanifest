@@ -1,0 +1,9 @@
+{
+  "name": "WARISS.DEV",
+  "short_name": "WARISS.DEV",
+  "icons": [{ "src": "/favicon.svg", "sizes": "any", "type": "image/svg+xml" }],
+  "theme_color": "#070b16",
+  "background_color": "#070b16",
+  "display": "standalone",
+  "start_url": "/"
+}

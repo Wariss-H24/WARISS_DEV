@@ -1,0 +1,133 @@
+.categories {
+  display: grid;
+  gap: var(--space-6);
+}
+
+.category {
+  gap: var(--space-6);
+  height: 100%;
+}
+
+.categoryTitle {
+  font-size: var(--text-2xl);
+}
+
+.skills {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.skill {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+}
+
+.skill:first-child {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.skillHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-4);
+}
+
+.skillName {
+  font-size: var(--text-lg);
+}
+
+.skillText {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.level {
+  display: inline-flex;
+  gap: 3px;
+}
+
+.on,
+.off {
+  width: 1.1rem;
+  height: 0.3rem;
+  border-radius: var(--radius-full);
+}
+
+.on {
+  background: var(--gradient-brand);
+}
+
+.off {
+  background: var(--color-border-strong);
+}
+
+.techGrid {
+  display: grid;
+  gap: var(--space-10);
+}
+
+.techCategory {
+  margin-bottom: var(--space-4);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-medium);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.techList {
+  display: grid;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.tech {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+}
+
+.tech img {
+  width: 1.5rem;
+  height: 1.5rem;
+  object-fit: contain;
+}
+
+.techDot {
+  width: 0.6rem;
+  height: 0.6rem;
+  border-radius: var(--radius-full);
+  background: var(--color-accent);
+}
+
+.techName {
+  flex: 1;
+  font-weight: var(--weight-medium);
+}
+
+@media (width >= 768px) {
+  .categories,
+  .techGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1280px) {
+  .techGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}

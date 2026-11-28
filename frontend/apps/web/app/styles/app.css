@@ -1,0 +1,13 @@
+/*
+ * Styles propres au site public (le design system est importé avant).
+ */
+body {
+  display: flex;
+  flex-direction: column;
+  background: radial-gradient(80rem 40rem at 50% -10%, color-mix(in srgb, var(--color-accent) 6%, transparent), transparent 70%), var(--color-bg);
+}
+
+#content {
+  flex: 1;
+  outline: none;
+}

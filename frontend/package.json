@@ -1,0 +1,34 @@
+{
+  "name": "wariss-dev-frontend",
+  "private": true,
+  "type": "module",
+  "description": "WARISS.DEV : site public (apps/web) et administration (apps/admin)",
+  "packageManager": "pnpm@12.23.0",
+  "engines": {
+    "node": ">=22.22.0"
+  },
+  "scripts": {
+    "dev:web": "pnpm --filter @wariss/web dev",
+    "dev:admin": "pnpm --filter @wariss/admin dev",
+    "build": "pnpm -r --filter ./apps/* build",
+    "typecheck": "pnpm -r typecheck",
+    "lint": "eslint . && stylelint \"**/*.css\"",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "api:types": "pnpm --filter @wariss/api-client generate"
+  },
+  "devDependencies": {
+    "@eslint/js": "9.39.5",
+    "eslint": "9.39.5",
+    "eslint-plugin-jsx-a11y": "6.10.2",
+    "eslint-plugin-react-hooks": "7.1.1",
+    "globals": "17.14.0",
+    "prettier": "3.10.1",
+    "stylelint": "18.1.0",
+    "stylelint-config-standard": "41.1.0",
+    "typescript": "6.0.3",
+    "typescript-eslint": "8.74.0",
+    "vitest": "5.1.2"
+  }
+}

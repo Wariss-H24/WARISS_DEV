@@ -1,0 +1,119 @@
+.footer {
+  position: relative;
+  margin-top: var(--section-y);
+  padding-top: var(--space-16);
+  border-top: 1px solid var(--color-border);
+  background: var(--color-bg-alt);
+  overflow: hidden;
+}
+
+.glow {
+  position: absolute;
+  top: -12rem;
+  left: 50%;
+  width: 40rem;
+  height: 20rem;
+  border-radius: var(--radius-full);
+  background: var(--aurora-1);
+  filter: blur(100px);
+  opacity: 0.5;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.grid {
+  position: relative;
+  display: grid;
+  gap: var(--space-10);
+}
+
+.about {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--space-4);
+  max-width: 22rem;
+}
+
+.brand {
+  border-radius: var(--radius-sm);
+}
+
+.tagline {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+}
+
+.column {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.heading {
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  letter-spacing: var(--tracking-label);
+  text-transform: uppercase;
+  color: var(--color-text-subtle);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.link {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  transition: color var(--duration-state) var(--ease-out);
+}
+
+.link:hover {
+  color: var(--color-text);
+}
+
+.platform {
+  text-transform: capitalize;
+}
+
+.bottom {
+  position: relative;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-12);
+  padding-block: var(--space-6);
+  border-top: 1px solid var(--color-border);
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.built {
+  font-family: var(--font-mono);
+}
+
+.top {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1);
+  color: var(--color-text-muted);
+}
+
+.top:hover {
+  color: var(--color-text);
+}
+
+@media (width >= 768px) {
+  .grid {
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+  }
+}

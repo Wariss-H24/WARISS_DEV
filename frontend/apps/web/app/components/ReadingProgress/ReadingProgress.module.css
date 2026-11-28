@@ -1,0 +1,8 @@
+.bar {
+  position: fixed;
+  inset: 0 0 auto;
+  z-index: calc(var(--z-header) + 1);
+  height: 3px;
+  background: var(--gradient-brand);
+  transform-origin: 0 50%;
+}

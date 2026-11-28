@@ -152,11 +152,32 @@ Conventions :
 3. **Mot de passe oublié** dans `auth`, s'il est souhaité. Aujourd'hui, `app:set-password` suffit.
 4. **Déploiement** (`documentation/07-DEPLOYMENT/`) : Horizon, rôle PostgreSQL dédié, S3, sauvegardes (spatie/laravel-backup), en-têtes CSP et HSTS.
 
-### Frontend (étape suivante principale)
-5. Le monorepo `frontend/` : `apps/web` (React Router v7 SSR), `apps/admin` (SPA) et `packages/*`.
-   - Lire `documentation/04-API-SPECIFICATIONS/conventions-api.md`.
-   - Générer les types avec `openapi-typescript` depuis `backend/openapi.json`.
-   - **À faire seulement quand l'utilisateur le demandera.**
+### Frontend : site public FAIT (28/11/2026), administration À FAIRE
+- **Commencé à la demande de l'utilisateur** (« très bien fait, comme un pro, avec une UI puissante »). Il veut **une phrase avant chaque action** pour savoir ce que je fais.
+- Versions et choix : décision **D-20**. Design system : `documentation/05-DESIGN-SYSTEM/design-system.md`.
+- **Fait** :
+  - le monorepo pnpm (`frontend/`) : `packages/config`, `packages/api-client` (`schema.d.ts` généré par `pnpm api:types`, plus `public.ts`), `packages/i18n` (FR/EN, une instance par requête) et `packages/ui` (tokens, thèmes, Button, Card projecteur, Badge, Field/Input/Select/Textarea/Checkbox, Dialog/Sheet, Tooltip, AuroraBackground…) ;
+  - **`apps/web`** (React Router 8 en rendu serveur), 27 routes :
+    - accueil (hero + fenêtre de code, bandeau de technologies, bento, sections de l'administration via `SectionRenderer`) ;
+    - listes et détails des projets, études de cas, services, laboratoire et blog (catégories et étiquettes) ;
+    - à propos, compétences, parcours, réalisations, témoignages, CV, contact (Turnstile et champ piège, envoi depuis le navigateur), terminal ;
+    - newsletter (confirmation, désinscription), aperçu signé, pages système et personnalisées, sitemap, robots, redirections ;
+  - les fonctions communes : palette ⌘K (navigation, actions, recherche), thème en cookie lu côté serveur, sélecteur de langue avec slugs traduits, SEO complet (canonique, hreflang, Open Graph, JSON-LD), mesure d'audience, partage avec `utm_medium=share` ;
+  - les contrôles : ESLint, Stylelint et Prettier propres, TypeScript propre, build OK ; les 20 adresses testées en direct contre l'API (200, 302 et 404 attendus) ;
+  - la CI `.github/workflows/frontend.yml`.
+- **Lancer en local** :
+  1. dans `backend/` : `php artisan serve --port=8000` ;
+  2. dans `frontend/apps/web/` : `API_URL=http://127.0.0.1:8000/api/v1 ./node_modules/.bin/react-router dev`, puis ouvrir http://localhost:5173.
+  Les pages du seeder sont en brouillon : une page système répond 404 tant qu'elle n'est pas publiée.
+- **Pièges du poste** :
+  - le `cd` déclenche fnm, qui affiche une erreur sans conséquence : enchaîner avec `;` plutôt que `&&` ;
+  - préfixer le `PATH` avec `~/node-v26.13.1-win-x64/node-v26.13.1-win-x64` ;
+  - Lucide 1.x n'a plus `Github`, `CheckCircle2`, `CircleAlert`, `Globe2` ni `Code2` : utiliser `SocialIcon`, `CircleCheck`, `CircleExclamationPoint`, `Globe` et `Code` ;
+  - un module `*.server.ts` ne doit jamais être importé par une fonction `meta` (l'adresse du site passe par le loader racine, `siteUrlOf`).
+- **Reste** :
+  - **`apps/admin`** (SPA Vite + TanStack Query + Axios + React Hook Form + Zod), sur l'organisation du cahier des charges §23 : connexion, tableau de bord, CRUD des 29 types, médias, CV, SEO, réglages, messages, statistiques ;
+  - des tests Vitest pour `packages/ui` et Playwright + axe pour le site ;
+  - une revue visuelle dans le navigateur.
 
 ## 6. Commandes utiles (depuis `backend/`)
 

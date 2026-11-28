@@ -1,0 +1,29 @@
+.two,
+.three {
+  display: grid;
+  gap: var(--space-6);
+  padding: 0;
+  list-style: none;
+}
+
+.item {
+  display: flex;
+  flex-direction: column;
+}
+
+.item > * {
+  flex: 1;
+}
+
+@media (width >= 768px) {
+  .two,
+  .three {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (width >= 1024px) {
+  .three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
