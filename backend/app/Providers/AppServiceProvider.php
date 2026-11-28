@@ -39,6 +39,9 @@ use App\Models\Settings\NavigationItem;
 use App\Models\Settings\NavigationMenu;
 use App\Models\Settings\SiteSetting;
 use App\Models\User;
+use Dedoc\Scramble\Scramble;
+use Dedoc\Scramble\Support\Generator\OpenApi;
+use Dedoc\Scramble\Support\Generator\Server;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
@@ -79,6 +82,18 @@ class AppServiceProvider extends ServiceProvider
         $this->configureMorphMap();
         $this->configureRateLimiting();
         $this->configureGates();
+        $this->configureApiDocumentation();
+    }
+
+    /**
+     * Documentation OpenAPI (Scramble) : serveur relatif, pour que backend/openapi.json soit identique
+     * quel que soit APP_URL (le fichier est versionné et vérifié par la CI).
+     */
+    protected function configureApiDocumentation(): void
+    {
+        Scramble::afterOpenApiGenerated(function (OpenApi $openApi): void {
+            $openApi->servers = [new Server('/api/v1')];
+        });
     }
 
     /**

@@ -88,3 +88,8 @@ jobs:
 
       - name: Tests (Pest)
         run: php artisan test
+
+      - name: Contrat OpenAPI à jour (openapi.json)
+        run: |
+          php artisan scramble:export
+          git diff --exit-code -- openapi.json || { echo "::error::openapi.json n'est plus à jour : lancez « php artisan scramble:export » et committez le fichier."; exit 1; }
