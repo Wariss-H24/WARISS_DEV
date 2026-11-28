@@ -8,6 +8,7 @@ use App\Enums\MessageType;
 use App\Models\Services\Service;
 use Database\Factories\Communication\MessageFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Hidden;
 use Illuminate\Database\Eloquent\Attributes\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -77,6 +78,7 @@ use Illuminate\Support\Carbon;
  */
 #[Table('messages')]
 #[Fillable(['type', 'service_id', 'name', 'email', 'subject', 'body', 'details', 'locale'])]
+#[Hidden(['ip_hash'])]
 class Message extends Model
 {
     /** @use HasFactory<MessageFactory> */

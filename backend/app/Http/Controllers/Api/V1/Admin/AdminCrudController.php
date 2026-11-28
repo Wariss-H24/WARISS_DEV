@@ -42,9 +42,15 @@ abstract class AdminCrudController extends Controller
     abstract protected function model(): string;
 
     /**
+     * Formulaire de création et de modification. Un contenu en lecture seule (journal, abonnés…)
+     * n'en déclare pas : ses routes n'exposent ni création ni modification.
+     *
      * @return class-string<AdminFormRequest>
      */
-    abstract protected function formRequest(): string;
+    protected function formRequest(): string
+    {
+        throw new LogicException('Ce contenu est en lecture seule.');
+    }
 
     /**
      * Relations plusieurs-à-plusieurs synchronisées depuis le formulaire (clé => relation).

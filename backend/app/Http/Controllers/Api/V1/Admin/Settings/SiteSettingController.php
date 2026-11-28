@@ -52,7 +52,7 @@ class SiteSettingController extends Controller
                     $setting->save();
                 }
 
-                $activityLogger->log(ActivityEvent::Updated, $setting, ['value']);
+                $activityLogger->log(ActivityEvent::SettingsChanged, $setting, ['value']);
             }
         });
 

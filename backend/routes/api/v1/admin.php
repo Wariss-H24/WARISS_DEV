@@ -12,7 +12,9 @@ use App\Http\Controllers\Api\V1\Admin\Catalog\SkillCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\SkillController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\TechnologyCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\TechnologyController;
+use App\Http\Controllers\Api\V1\Admin\Communication\MessageController;
 use App\Http\Controllers\Api\V1\Admin\Communication\NewsletterCampaignController;
+use App\Http\Controllers\Api\V1\Admin\Communication\NewsletterSubscriberController;
 use App\Http\Controllers\Api\V1\Admin\Communication\TestimonialController;
 use App\Http\Controllers\Api\V1\Admin\Identity\ProfileController;
 use App\Http\Controllers\Api\V1\Admin\Identity\SocialLinkController;
@@ -33,6 +35,8 @@ use App\Http\Controllers\Api\V1\Admin\Services\ServiceController;
 use App\Http\Controllers\Api\V1\Admin\Settings\NavigationItemController;
 use App\Http\Controllers\Api\V1\Admin\Settings\NavigationMenuController;
 use App\Http\Controllers\Api\V1\Admin\Settings\SiteSettingController;
+use App\Http\Controllers\Api\V1\Admin\System\AccountController;
+use App\Http\Controllers\Api\V1\Admin\System\ActivityLogController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -112,3 +116,15 @@ $crud('resumes', ResumeController::class);
 Route::post('resumes/{id}/versions', [ResumeVersionController::class, 'store'])->whereNumber('id')->name('resumes.versions.store');
 Route::patch('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'update'])->whereNumber(['id', 'versionId'])->name('resumes.versions.update');
 Route::delete('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'destroy'])->whereNumber(['id', 'versionId'])->name('resumes.versions.destroy');
+
+// Données sensibles : réservées au compte admin, y compris en lecture (gate view-sensitive-data)
+Route::middleware('can:view-sensitive-data')->group(function (): void {
+    Route::apiResource('messages', MessageController::class)->except(['store'])->parameters(['messages' => 'id'])->whereNumber('id');
+    Route::post('messages/{id}/restore', [MessageController::class, 'restore'])->whereNumber('id')->name('messages.restore');
+
+    Route::apiResource('newsletter-subscribers', NewsletterSubscriberController::class)->only(['index', 'show', 'destroy'])->parameters(['newsletter-subscribers' => 'id'])->whereNumber('id');
+    Route::post('newsletter-subscribers/{id}/unsubscribe', [NewsletterSubscriberController::class, 'unsubscribe'])->whereNumber('id')->name('newsletter-subscribers.unsubscribe');
+
+    Route::apiResource('activity-logs', ActivityLogController::class)->only(['index', 'show'])->parameters(['activity-logs' => 'id'])->whereNumber('id');
+    Route::apiResource('accounts', AccountController::class)->only(['index', 'show'])->parameters(['accounts' => 'id'])->whereNumber('id');
+});
