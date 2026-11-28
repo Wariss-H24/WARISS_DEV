@@ -1,0 +1,16 @@
+/*
+ * Styles propres à l'administration (le design system est importé avant).
+ */
+body {
+  background: var(--color-bg);
+}
+
+#root {
+  min-height: 100dvh;
+}
+
+fieldset:disabled input,
+fieldset:disabled textarea,
+fieldset:disabled select {
+  cursor: default;
+}

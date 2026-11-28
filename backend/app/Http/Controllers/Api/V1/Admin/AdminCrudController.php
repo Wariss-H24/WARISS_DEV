@@ -130,10 +130,28 @@ abstract class AdminCrudController extends Controller
         return new $resourceClass($model);
     }
 
+    /**
+     * Filtres de la liste, plus filter[trashed]=only|with pour un contenu avec corbeille
+     * (consulter et restaurer les contenus supprimés en douceur).
+     *
+     * @return list<AllowedFilter|string>
+     */
+    private function filtersWithTrash(): array
+    {
+        $filters = $this->filters();
+        $names = array_map(fn (AllowedFilter|string $filter): string => $filter instanceof AllowedFilter ? $filter->getName() : $filter, $filters);
+
+        if ($this->usesSoftDeletes() && ! in_array('trashed', $names, true)) {
+            $filters[] = AllowedFilter::trashed();
+        }
+
+        return $filters;
+    }
+
     public function index(Request $request): AnonymousResourceCollection
     {
         $query = QueryBuilder::for($this->baseQuery(), $request)
-            ->allowedFilters(...$this->filters())
+            ->allowedFilters(...$this->filtersWithTrash())
             ->allowedSorts(...$this->sorts())
             ->defaultSort($this->defaultSort());
 

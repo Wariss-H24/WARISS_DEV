@@ -260,3 +260,14 @@ it('lists every administration resource', function (string $uri) {
     'pages', 'page-sections', 'navigation-menus', 'navigation-items', 'social-links',
     'media-collections', 'redirects', 'resumes',
 ]);
+
+it('lists the trash of a soft-deletable content to restore it', function () {
+    actingAsAdmin();
+    $kept = Project::factory()->create();
+    $trashed = Project::factory()->create();
+    $trashed->delete();
+
+    $this->getJson('/api/v1/admin/projects')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $kept->id);
+    $this->getJson('/api/v1/admin/projects?filter[trashed]=only')->assertOk()->assertJsonCount(1, 'data')->assertJsonPath('data.0.id', $trashed->id);
+    $this->getJson('/api/v1/admin/technologies?filter[trashed]=only')->assertStatus(400);
+});

@@ -1,0 +1,141 @@
+.panel {
+  gap: var(--space-4);
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  color: var(--color-accent-text);
+}
+
+.panelTitle {
+  flex: 1;
+  color: var(--color-text);
+  font-size: var(--text-md);
+}
+
+.miniTabs {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-xs);
+}
+
+.miniTabs button {
+  padding: 2px var(--space-2);
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+}
+
+.miniTabs button[aria-selected='true'] {
+  background: var(--color-accent);
+  color: var(--color-on-accent);
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+  min-width: 0;
+  padding: 0;
+  border: 0;
+}
+
+.counter,
+.over {
+  margin-left: var(--space-2);
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  font-weight: var(--weight-regular);
+}
+
+.counter {
+  color: var(--color-text-subtle);
+}
+
+.over {
+  color: var(--color-danger);
+}
+
+.muted {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.link {
+  color: var(--color-accent-text);
+  font-size: var(--text-sm);
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.versions {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: 0;
+  list-style: none;
+}
+
+.version {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.versionTitle {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-weight: var(--weight-semibold);
+}
+
+.versionMeta {
+  color: var(--color-text-subtle);
+  font-size: var(--text-xs);
+}
+
+.dl {
+  display: grid;
+  gap: var(--space-2);
+  font-size: var(--text-sm);
+}
+
+.dl div {
+  display: grid;
+  grid-template-columns: 6rem 1fr;
+  gap: var(--space-2);
+}
+
+.dl dt {
+  color: var(--color-text-subtle);
+}
+
+.dl dd {
+  overflow-wrap: anywhere;
+}
+
+.messageSubject {
+  font-weight: var(--weight-semibold);
+}
+
+.messageBody {
+  max-height: 22rem;
+  padding: var(--space-3);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-alt);
+  font-size: var(--text-sm);
+  overflow-y: auto;
+  white-space: pre-wrap;
+}

@@ -1,0 +1,10 @@
+{
+  "extends": "@wariss/config/tsconfig.base.json",
+  "include": ["src", "vite.config.ts", "env.d.ts"],
+  "compilerOptions": {
+    "types": ["vite/client"],
+    "paths": {
+      "~/*": ["./src/*"]
+    }
+  }
+}

@@ -1,0 +1,74 @@
+.chart {
+  margin: 0;
+}
+
+.svg {
+  width: 100%;
+  height: 11rem;
+  overflow: visible;
+}
+
+.grid {
+  stroke: var(--color-border);
+  stroke-dasharray: 3 4;
+}
+
+.bar {
+  fill: var(--color-accent);
+  opacity: 0.85;
+  transition: opacity var(--duration-micro) var(--ease-out);
+}
+
+.bar:hover {
+  opacity: 1;
+}
+
+.axis {
+  fill: var(--color-text-subtle);
+  font-family: var(--font-mono);
+  font-size: 9px;
+}
+
+.empty {
+  color: var(--color-text-subtle);
+  font-size: var(--text-sm);
+}
+
+.rank {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  padding: 0;
+  list-style: none;
+}
+
+.rankItem {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-xs);
+  overflow: hidden;
+  font-size: var(--text-sm);
+}
+
+.rankBar {
+  position: absolute;
+  inset: 0 auto 0 0;
+  background: var(--color-accent-soft);
+}
+
+.rankLabel {
+  position: relative;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rankCount {
+  position: relative;
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+}

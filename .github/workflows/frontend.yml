@@ -69,3 +69,6 @@ jobs:
 
       - name: Build du site public
         run: pnpm --filter @wariss/web build
+
+      - name: Build de l'administration
+        run: pnpm --filter @wariss/admin build

@@ -1,0 +1,39 @@
+{
+  "name": "@wariss/admin",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Administration WARISS.DEV (SPA privée, noindex)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -p tsconfig.json && vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@fontsource-variable/inter": "5.3.0",
+    "@fontsource-variable/jetbrains-mono": "5.3.0",
+    "@fontsource-variable/space-grotesk": "5.3.0",
+    "@tanstack/react-query": "5.108.4",
+    "@wariss/api-client": "workspace:*",
+    "@wariss/ui": "workspace:*",
+    "axios": "1.21.1",
+    "lucide-react": "1.81.0",
+    "radix-ui": "1.8.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "react-hook-form": "7.92.0",
+    "react-markdown": "10.1.0",
+    "react-router": "8.5.3",
+    "rehype-sanitize": "6.0.0",
+    "remark-gfm": "4.0.1"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.3",
+    "@types/react-dom": "19.3.0",
+    "@vitejs/plugin-react": "6.3.0",
+    "@wariss/config": "workspace:*",
+    "typescript": "6.0.3",
+    "vite": "8.4.0"
+  }
+}

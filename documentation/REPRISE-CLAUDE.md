@@ -152,7 +152,7 @@ Conventions :
 3. **Mot de passe oublié** dans `auth`, s'il est souhaité. Aujourd'hui, `app:set-password` suffit.
 4. **Déploiement** (`documentation/07-DEPLOYMENT/`) : Horizon, rôle PostgreSQL dédié, S3, sauvegardes (spatie/laravel-backup), en-têtes CSP et HSTS.
 
-### Frontend : site public FAIT (28/11/2026), administration À FAIRE
+### Frontend : site public et administration FAITS (28/11/2026)
 - **Commencé à la demande de l'utilisateur** (« très bien fait, comme un pro, avec une UI puissante »). Il veut **une phrase avant chaque action** pour savoir ce que je fais.
 - Versions et choix : décision **D-20**. Design system : `documentation/05-DESIGN-SYSTEM/design-system.md`.
 - **Fait** :
@@ -174,10 +174,24 @@ Conventions :
   - préfixer le `PATH` avec `~/node-v26.13.1-win-x64/node-v26.13.1-win-x64` ;
   - Lucide 1.x n'a plus `Github`, `CheckCircle2`, `CircleAlert`, `Globe2` ni `Code2` : utiliser `SocialIcon`, `CircleCheck`, `CircleExclamationPoint`, `Globe` et `Code` ;
   - un module `*.server.ts` ne doit jamais être importé par une fonction `meta` (l'adresse du site passe par le loader racine, `siteUrlOf`).
+- **Administration `apps/admin` : FAITE (28/11/2026, D-21)**
+  - SPA Vite + React Router 8, TanStack Query, Axios (Sanctum), React Hook Form ; interface en français, thème clair.
+  - **Moteur CRUD déclaratif** : `src/crud/resources.ts` décrit les 30 types (champs, colonnes, filtres), en miroir des FormRequest du backend. Les composants génériques sont :
+    - `ResourceListPage` : filtres, recherche, tri, pagination, corbeille, restauration ;
+    - `ResourceFormPage` : onglets FR/EN avec compteur d'erreurs, erreurs 422 sur les champs, `Ctrl+S`, garde des modifications non enregistrées, lecture seule pour le viewer ;
+    - les champs dans `src/crud/fields/` : texte, slug, Markdown avec aperçu, relation simple et multiple, média, enfants, JSON, couleur.
+  - **Pages dédiées** :
+    - connexion, tableau de bord, statistiques ;
+    - bibliothèque de médias (glisser-déposer, doublons, usages, médias externes) ;
+    - profil, réglages par lot.
+  - **Panneaux** : SEO par contenu, aperçu signé, versions de CV (PDF), détail d'un message.
+  - Pour ajouter un type de contenu, il suffit d'une entrée dans `resources.ts` et d'une entrée dans `layouts/navigation.ts`.
+  - **Lancer** : dans `frontend/apps/admin/`, lancer `./node_modules/.bin/vite --port 5174`, puis ouvrir http://localhost:5174. L'API doit tourner sur le port 8000. Le mot de passe se définit avec `php artisan app:set-password {email}`.
 - **Reste** :
-  - **`apps/admin`** (SPA Vite + TanStack Query + Axios + React Hook Form + Zod), sur l'organisation du cahier des charges §23 : connexion, tableau de bord, CRUD des 29 types, médias, CV, SEO, réglages, messages, statistiques ;
-  - des tests Vitest pour `packages/ui` et Playwright + axe pour le site ;
-  - une revue visuelle dans le navigateur.
+  - des tests Vitest pour `packages/ui` et l'administration, et Playwright + axe pour le site ;
+  - une revue visuelle dans le navigateur avec du vrai contenu ;
+  - la suppression définitive depuis la corbeille dans l'interface (l'API la permet déjà : `DELETE {id}/force`) ;
+  - le réordonnancement par glisser-déposer (aujourd'hui : champ « Ordre » et flèches dans les éléments enfants).
 
 ## 6. Commandes utiles (depuis `backend/`)
 
