@@ -10,7 +10,7 @@ import { Logo } from '../Logo/Logo';
 import { SocialIcon } from '../SocialIcon/SocialIcon';
 import styles from './SiteFooter.module.css';
 
-const DEFAULT_EXPLORE: RouteKey[] = ['about', 'projects', 'services', 'blog', 'resume', 'contact'];
+const DEFAULT_EXPLORE: RouteKey[] = ['about', 'projects', 'services', 'blog', 'terminal', 'resume', 'contact'];
 const DEFAULT_LEGAL: RouteKey[] = ['legal-notice', 'privacy'];
 
 function FooterLinks({ locale, items, fallback }: { locale: Locale; items: MenuItem[] | undefined; fallback: RouteKey[] }) {

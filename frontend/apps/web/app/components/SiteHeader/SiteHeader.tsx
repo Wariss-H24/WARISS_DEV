@@ -1,7 +1,7 @@
 import type { MenuItem, Site } from '@wariss/api-client';
 import type { Locale } from '@wariss/i18n';
-import { Button, Dialog, Kbd } from '@wariss/ui';
-import { ArrowUpRight, Menu, Search } from 'lucide-react';
+import { Button, Dialog, Kbd, Tooltip } from '@wariss/ui';
+import { ArrowUpRight, Menu, Search, SquareTerminal } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Link, NavLink, useLocation } from 'react-router';
@@ -105,6 +105,16 @@ export function SiteHeader({ locale, site }: { locale: Locale; site: Site | null
             </button>
             <LanguageSwitcher locale={locale} className={styles.desktopOnly} />
             <ThemeToggle className={styles.desktopOnly} />
+            <Tooltip content={t('nav.terminal')}>
+              <NavLink
+                to={pathTo(locale, 'terminal')}
+                prefetch="intent"
+                aria-label={t('nav.terminal')}
+                className={({ isActive }) => `${styles.terminal} ${isActive ? styles.terminalActive : ''}`}
+              >
+                <SquareTerminal aria-hidden="true" size={18} />
+              </NavLink>
+            </Tooltip>
             <Button asChild size="sm" className={styles.cta}>
               <Link to={pathTo(locale, 'contact')} prefetch="intent">
                 {t('actions.contactMe')}

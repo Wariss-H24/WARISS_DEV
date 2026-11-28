@@ -200,7 +200,16 @@
     "timeline": "Timeline"
   },
   "contact": {
-    "eyebrow": "Contact",
+    "eyebrow": "Get in touch",
+    "heading": "Let's work together",
+    "intro": "Have a project in mind, a collaboration, a technical question, or just want to say hello? Write to me: I reply personally within 48 hours.",
+    "formTitle": "Send a message",
+    "namePlaceholder": "John Doe",
+    "emailPlaceholder": "john@example.com",
+    "subjectPlaceholder": "Project inquiry",
+    "messagePlaceholder": "Tell me about your project or idea…",
+    "location": "Location",
+    "emailLabel": "Email",
     "title": "Let's talk about your project",
     "description": "A question, a project, a collaboration? Write to me: I reply personally within 48 hours.",
     "name": "Name",

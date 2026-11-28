@@ -200,7 +200,16 @@
     "timeline": "Chronologie"
   },
   "contact": {
-    "eyebrow": "Contact",
+    "eyebrow": "Me contacter",
+    "heading": "Travaillons ensemble",
+    "intro": "Un projet en tête, une collaboration, une question technique, ou simplement envie de dire bonjour ? Écrivez-moi : je réponds personnellement sous 48 heures.",
+    "formTitle": "Envoyer un message",
+    "namePlaceholder": "Jean Dupont",
+    "emailPlaceholder": "jean@exemple.com",
+    "subjectPlaceholder": "Demande de projet",
+    "messagePlaceholder": "Parlez-moi de votre projet ou de votre idée…",
+    "location": "Localisation",
+    "emailLabel": "E-mail",
     "title": "Parlons de votre projet",
     "description": "Une question, un projet, une collaboration ? Écrivez-moi : je réponds personnellement sous 48 heures.",
     "name": "Nom",

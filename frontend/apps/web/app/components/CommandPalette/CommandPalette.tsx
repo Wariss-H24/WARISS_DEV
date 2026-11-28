@@ -15,6 +15,7 @@ import {
   Moon,
   Search,
   Sparkles,
+  SquareTerminal,
   Sun,
   User,
   type LucideIcon,
@@ -53,6 +54,7 @@ const NAVIGATION: Array<[RouteKey, LucideIcon]> = [
   ['services', Briefcase],
   ['lab', FlaskConical],
   ['blog', BookOpen],
+  ['terminal', SquareTerminal],
   ['contact', Mail],
 ];
 
