@@ -11,6 +11,7 @@ import { SocialIcon } from '~/components/SocialIcon/SocialIcon';
 import { Turnstile } from '~/components/Turnstile/Turnstile';
 import { apiGetOr } from '~/lib/api.server';
 import { submitPublicForm } from '~/lib/public-form';
+import { platformLabel, socialLinksOf } from '~/lib/social';
 import { layoutSite, routeLocale, siteName, siteUrlOf } from '~/lib/route-helpers';
 import { buildMeta, staticPaths } from '~/lib/seo';
 import type { loader as layoutLoader } from './lang-layout';
@@ -224,21 +225,19 @@ export default function Contact() {
                 </a>
               </Card>
             ) : null}
-            {profile?.social_links.length ? (
-              <Card padded>
-                <p className="mono-label">{t('footer.connect')}</p>
-                <ul className={styles.socials}>
-                  {profile.social_links.map((link) => (
-                    <li key={link.id}>
-                      <a href={link.url} target="_blank" rel="noopener noreferrer me" className={styles.social}>
-                        <SocialIcon platform={link.platform} size={16} />
-                        <span>{link.platform}</span>
-                      </a>
-                    </li>
-                  ))}
-                </ul>
-              </Card>
-            ) : null}
+            <Card padded>
+              <p className="mono-label">{t('footer.connect')}</p>
+              <ul className={styles.socials}>
+                {socialLinksOf(layout?.site ?? null).map((link) => (
+                  <li key={link.id}>
+                    <a href={link.url} target="_blank" rel="noopener noreferrer me" className={styles.social}>
+                      <SocialIcon platform={link.platform} size={16} />
+                      <span>{platformLabel(link.platform)}</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </Card>
           </aside>
         </Container>
       </Section>

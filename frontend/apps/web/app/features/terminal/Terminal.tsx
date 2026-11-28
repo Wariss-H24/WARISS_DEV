@@ -5,6 +5,7 @@ import { Link, useNavigate } from 'react-router';
 import { applyTheme } from '~/components/ThemeToggle/ThemeToggle';
 import { formatPeriod } from '~/lib/format';
 import { contentPath, pathTo } from '~/lib/routes';
+import { DEFAULT_SOCIAL_LINKS } from '~/lib/social';
 import { resumeDownloadUrl } from '~/lib/tracking';
 import styles from './Terminal.module.css';
 
@@ -86,7 +87,8 @@ export function Terminal({ locale, data }: { locale: Locale; data: TerminalData 
   const endRef = useRef<HTMLDivElement>(null);
   const nextId = useRef(1);
   const prompt = `${(data.profile?.first_name ?? 'guest').toLowerCase()}@wariss.dev:~$`;
-  const github = data.profile?.social_links.find((link) => link.platform.toLowerCase() === 'github');
+  const socialLinks = data.profile?.social_links.length ? data.profile.social_links : DEFAULT_SOCIAL_LINKS;
+  const github = socialLinks.find((link) => link.platform.toLowerCase() === 'github');
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ block: 'nearest' });
@@ -164,9 +166,9 @@ export function Terminal({ locale, data }: { locale: Locale; data: TerminalData 
       return text.opening(github.url);
     },
     social: () =>
-      data.profile?.social_links.length ? (
+      socialLinks.length ? (
         <ul className={styles.list}>
-          {data.profile.social_links.map((link) => (
+          {socialLinks.map((link) => (
             <li key={link.id}>
               <span className={styles.accent}>{link.platform}</span>{' '}
               <a href={link.url} target="_blank" rel="noopener noreferrer">

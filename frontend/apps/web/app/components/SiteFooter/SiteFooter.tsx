@@ -5,6 +5,7 @@ import { ArrowUp, ArrowUpRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router';
 import { menuItemHref, pathTo, type RouteKey } from '~/lib/routes';
+import { platformLabel, socialLinksOf } from '~/lib/social';
 import { Logo } from '../Logo/Logo';
 import { SocialIcon } from '../SocialIcon/SocialIcon';
 import styles from './SiteFooter.module.css';
@@ -80,21 +81,19 @@ export function SiteFooter({ locale, site }: { locale: Locale; site: Site | null
           </ul>
         </nav>
 
-        {profile?.social_links.length ? (
-          <div className={styles.column}>
-            <p className={styles.heading}>{t('footer.connect')}</p>
-            <ul className={styles.list}>
-              {profile.social_links.map((link) => (
-                <li key={link.id}>
-                  <a href={link.url} className={styles.link} target="_blank" rel="noopener noreferrer me">
-                    <SocialIcon platform={link.platform} size={15} />
-                    <span className={styles.platform}>{link.platform}</span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : null}
+        <div className={styles.column}>
+          <p className={styles.heading}>{t('footer.connect')}</p>
+          <ul className={styles.list}>
+            {socialLinksOf(site).map((link) => (
+              <li key={link.id}>
+                <a href={link.url} className={styles.link} target="_blank" rel="noopener noreferrer me">
+                  <SocialIcon platform={link.platform} size={15} />
+                  <span>{platformLabel(link.platform)}</span>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
 
         <nav aria-label={t('footer.legal')} className={styles.column}>
           <p className={styles.heading}>{t('footer.legal')}</p>
