@@ -181,15 +181,33 @@
 }
 
 @media (width >= 1024px) {
+  .desktopOnly {
+    display: inline-flex !important;
+  }
+}
+
+/* Barre de navigation complète (jusqu'à 8 entrées, cahier des charges §24) sur grand écran ;
+   le menu latéral reste disponible en dessous. */
+@media (width >= 1280px) {
   .nav {
     display: flex;
   }
 
-  .desktopOnly {
-    display: inline-flex !important;
-  }
-
   .menuButton {
     display: none;
+  }
+
+  .searchLabel {
+    display: none;
+  }
+
+  .searchKeys {
+    margin-left: var(--space-1);
+  }
+}
+
+@media (width >= 1536px) {
+  .searchLabel {
+    display: inline-flex;
   }
 }

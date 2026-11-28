@@ -12,8 +12,8 @@ import { Logo } from '../Logo/Logo';
 import { ThemeToggle } from '../ThemeToggle/ThemeToggle';
 import styles from './SiteHeader.module.css';
 
-/** Navigation par défaut, si aucun menu « header » n'est configuré dans l'administration. */
-const DEFAULT_NAV: RouteKey[] = ['about', 'projects', 'services', 'lab', 'blog'];
+/** Navigation par défaut (cahier des charges §24), si aucun menu « header » n'est configuré dans l'administration. L'accueil passe par le logo, le contact par le bouton dédié. */
+const DEFAULT_NAV: RouteKey[] = ['about', 'skills', 'experience', 'projects', 'services', 'lab', 'blog', 'achievements'];
 
 interface NavEntry {
   key: string;
