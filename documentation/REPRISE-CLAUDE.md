@@ -179,3 +179,4 @@ Pièges connus :
 - Appelle un scope par attribut sur un `Builder<Model>` générique avec `->scopes(['published'])`.
 - Une erreur SQL dans une transaction PostgreSQL bloque toute la suite de la transaction : enveloppe chaque opération risquée dans sa propre `DB::transaction`.
 - Pour tester une contrainte CHECK, passe par `DB::table()->update()`.
+- `scramble:export` lit le schéma des tables : il lui faut une base migrée (dans la CI, `wariss_dev_test`).
