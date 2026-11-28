@@ -40,6 +40,7 @@ use App\Http\Controllers\Api\V1\Admin\System\AccountController;
 use App\Http\Controllers\Api\V1\Admin\System\ActivityLogController;
 use App\Http\Controllers\Api\V1\Admin\System\AnalyticsController;
 use App\Http\Controllers\Api\V1\Admin\System\DashboardController;
+use App\Http\Controllers\Api\V1\Admin\System\PreviewLinkController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -125,6 +126,7 @@ Route::delete('resumes/{id}/versions/{versionId}', [ResumeVersionController::cla
 // Tableau de bord et statistiques d'audience (données anonymes, D-16)
 Route::get('dashboard', DashboardController::class)->name('dashboard');
 Route::get('analytics', AnalyticsController::class)->name('analytics');
+Route::get('preview-link', PreviewLinkController::class)->name('preview-link');
 
 // Données sensibles : réservées au compte admin, y compris en lecture (gate view-sensitive-data)
 Route::middleware('can:view-sensitive-data')->group(function (): void {

@@ -9,6 +9,11 @@
 return [
 
     /*
+    | Adresse du site public (liens des e-mails, sitemap, aperçus des brouillons).
+    */
+    'site_url' => rtrim((string) env('SITE_URL', 'http://localhost:5173'), '/'),
+
+    /*
     | Comptes d'administration créés par le seeder (décision D-04).
     |
     | Aucune donnée personnelle ni aucun mot de passe dans le code : tout vient
