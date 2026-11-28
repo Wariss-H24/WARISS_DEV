@@ -30,6 +30,7 @@ use App\Http\Controllers\Api\V1\Admin\Portfolio\ProjectController;
 use App\Http\Controllers\Api\V1\Admin\Resume\ResumeController;
 use App\Http\Controllers\Api\V1\Admin\Resume\ResumeVersionController;
 use App\Http\Controllers\Api\V1\Admin\Seo\RedirectController;
+use App\Http\Controllers\Api\V1\Admin\Seo\SeoMetadataController;
 use App\Http\Controllers\Api\V1\Admin\Services\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Services\ServiceController;
 use App\Http\Controllers\Api\V1\Admin\Settings\NavigationItemController;
@@ -37,6 +38,8 @@ use App\Http\Controllers\Api\V1\Admin\Settings\NavigationMenuController;
 use App\Http\Controllers\Api\V1\Admin\Settings\SiteSettingController;
 use App\Http\Controllers\Api\V1\Admin\System\AccountController;
 use App\Http\Controllers\Api\V1\Admin\System\ActivityLogController;
+use App\Http\Controllers\Api\V1\Admin\System\AnalyticsController;
+use App\Http\Controllers\Api\V1\Admin\System\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -112,10 +115,16 @@ $crud('media-collections', MediaCollectionController::class);
 $crud('media', MediaController::class);
 Route::get('media/{id}/file', [MediaController::class, 'file'])->whereNumber('id')->name('media.file');
 $crud('redirects', RedirectController::class);
+Route::get('seo/{type}/{id}', [SeoMetadataController::class, 'show'])->whereIn('type', SeoMetadataController::TYPES)->whereNumber('id')->name('seo.show');
+Route::put('seo/{type}/{id}', [SeoMetadataController::class, 'update'])->whereIn('type', SeoMetadataController::TYPES)->whereNumber('id')->name('seo.update');
 $crud('resumes', ResumeController::class);
 Route::post('resumes/{id}/versions', [ResumeVersionController::class, 'store'])->whereNumber('id')->name('resumes.versions.store');
 Route::patch('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'update'])->whereNumber(['id', 'versionId'])->name('resumes.versions.update');
 Route::delete('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'destroy'])->whereNumber(['id', 'versionId'])->name('resumes.versions.destroy');
+
+// Tableau de bord et statistiques d'audience (données anonymes, D-16)
+Route::get('dashboard', DashboardController::class)->name('dashboard');
+Route::get('analytics', AnalyticsController::class)->name('analytics');
 
 // Données sensibles : réservées au compte admin, y compris en lecture (gate view-sensitive-data)
 Route::middleware('can:view-sensitive-data')->group(function (): void {
