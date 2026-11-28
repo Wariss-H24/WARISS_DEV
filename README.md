@@ -4,7 +4,7 @@ Plateforme personnelle professionnelle (portfolio, services, blog, laboratoire, 
 
 **Stack :** API Laravel + PostgreSQL + Redis · site public React Router v7 (rendu serveur) · administration React (SPA) · authentification Sanctum par cookie · français et anglais.
 
-**État :** conception terminée et validée (décisions D-01 à D-10). Prochaine étape : création du projet Laravel, puis migrations, modèles et seeders.
+**État (28/11/2026) :** backend terminé pour la V1 : base de données (86 tables), API d’administration, API publique, formulaires, mesure d’audience, contrat OpenAPI. Décisions D-01 à D-19. Prochaine étape : le frontend.
 
 ## Documents de référence
 
@@ -13,6 +13,7 @@ Plateforme personnelle professionnelle (portfolio, services, blog, laboratoire, 
 | [Cahier des charges général (v1.1)](documentation/00-VISION/cahier-des-charges-general.md) | Référence fonctionnelle : 18 domaines, pages, routes, lots de livraison |
 | [Structure de la base de données](documentation/02-DATABASE/structure-base-de-donnees.md) | 86 tables, conventions, index, ordre des migrations |
 | [Architecture technique](documentation/03-TECHNICAL-ARCHITECTURE/architecture-technique.md) | Backend, frontend, dépendances, [registre des décisions](documentation/03-TECHNICAL-ARCHITECTURE/architecture-technique.md#8-registre-des-décisions) |
+| [Conventions de l’API](documentation/04-API-SPECIFICATIONS/conventions-api.md) | Accès, langue, formats, public, formulaires, audience, aperçu, médias ; détail dans `backend/openapi.json` |
 | [Comptes et mots de passe](documentation/03-TECHNICAL-ARCHITECTURE/comptes-et-mots-de-passe.md) | Création des comptes, hachage, commande `app:set-password`, politique de mot de passe |
 | [Archive : cahier des charges du 14/11/2026](documentation/99-ARCHIVE/cahier-des-charges-general_2026-11-14.md) | Remplacé par la v1.1, conservé pour l'historique |
 
