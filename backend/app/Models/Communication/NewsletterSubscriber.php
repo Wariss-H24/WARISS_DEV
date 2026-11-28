@@ -103,6 +103,23 @@ class NewsletterSubscriber extends Model
     }
 
     /**
+     * Jeton du lien de désinscription présent dans chaque e-mail : signé (APP_KEY), sans table,
+     * propre à l'abonné et à son adresse, valable sans limite de durée.
+     */
+    public function unsubscribeToken(): string
+    {
+        return hash_hmac('sha256', "newsletter-unsubscribe:{$this->id}:{$this->email}", (string) config('app.key'));
+    }
+
+    /**
+     * URL de désinscription du site public, dans la langue de l'abonné.
+     */
+    public function unsubscribeUrl(): string
+    {
+        return config('wariss.site_url')."/{$this->locale}/newsletter/unsubscribe?id={$this->id}&token={$this->unsubscribeToken()}";
+    }
+
+    /**
      * @return HasMany<NewsletterCampaignRecipient, $this>
      */
     public function deliveries(): HasMany

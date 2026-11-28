@@ -3,7 +3,9 @@
 use App\Http\Controllers\Api\V1\Public\CareerController;
 use App\Http\Controllers\Api\V1\Public\CaseStudyController;
 use App\Http\Controllers\Api\V1\Public\CatalogController;
+use App\Http\Controllers\Api\V1\Public\ContactController;
 use App\Http\Controllers\Api\V1\Public\ExperimentController;
+use App\Http\Controllers\Api\V1\Public\NewsletterController;
 use App\Http\Controllers\Api\V1\Public\PageController;
 use App\Http\Controllers\Api\V1\Public\PostController;
 use App\Http\Controllers\Api\V1\Public\PreviewController;
@@ -64,6 +66,14 @@ Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 Route::get('preview/{token}', PreviewController::class)
     ->where('token', '[a-z_]+\.[0-9]+\.[a-z]{2}\.[0-9]+\.[0-9a-f]{64}')
     ->name('preview');
+
+// Formulaires (Turnstile + champ piège, 5 envois par minute et par adresse IP)
+Route::middleware('throttle:public-forms')->group(function (): void {
+    Route::post('contact', ContactController::class)->name('contact');
+    Route::post('newsletter/subscribe', [NewsletterController::class, 'subscribe'])->name('newsletter.subscribe');
+    Route::post('newsletter/confirm', [NewsletterController::class, 'confirm'])->name('newsletter.confirm');
+    Route::post('newsletter/unsubscribe', [NewsletterController::class, 'unsubscribe'])->name('newsletter.unsubscribe');
+});
 
 // Mesure d'audience sans cookie (D-16)
 Route::middleware('throttle:tracking')->prefix('track')->name('track.')->group(function (): void {

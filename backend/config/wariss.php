@@ -14,6 +14,18 @@ return [
     'site_url' => rtrim((string) env('SITE_URL', 'http://localhost:5173'), '/'),
 
     /*
+    | Adresse de l'administration (liens des e-mails envoyés au propriétaire).
+    */
+    'admin_url' => rtrim((string) env('ADMIN_URL', 'http://localhost:5174'), '/'),
+
+    /*
+    | Newsletter : durée de validité du lien de confirmation (jours).
+    */
+    'newsletter' => [
+        'confirmation_days' => 7,
+    ],
+
+    /*
     | Comptes d'administration créés par le seeder (décision D-04).
     |
     | Aucune donnée personnelle ni aucun mot de passe dans le code : tout vient

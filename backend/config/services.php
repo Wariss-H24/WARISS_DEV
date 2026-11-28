@@ -14,6 +14,16 @@ return [
     |
     */
 
+    /*
+    | Cloudflare Turnstile : protection anti-robots des formulaires publics, vérifiée côté serveur.
+    | Sans clé secrète, la vérification est désactivée hors production et refusée en production.
+    */
+    'turnstile' => [
+        'site_key' => env('TURNSTILE_SITE_KEY'),
+        'secret_key' => env('TURNSTILE_SECRET_KEY'),
+        'verify_url' => 'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+    ],
+
     'postmark' => [
         'key' => env('POSTMARK_API_KEY'),
     ],

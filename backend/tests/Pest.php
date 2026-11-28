@@ -16,4 +16,9 @@ use Tests\TestCase;
 
 pest()->extend(TestCase::class)
     ->use(RefreshDatabase::class)
+    ->beforeEach(function () {
+        // Le client de test envoie « Accept-Language: en-us » par défaut : on simule un visiteur
+        // francophone (langue par défaut du site) ; les tests en anglais passent ?locale=en.
+        $this->withHeader('Accept-Language', 'fr-FR,fr;q=0.9');
+    })
     ->in('Feature');
