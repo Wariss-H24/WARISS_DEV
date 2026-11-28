@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\V1\Admin\Catalog\TechnologyCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Catalog\TechnologyController;
 use App\Http\Controllers\Api\V1\Admin\Communication\NewsletterCampaignController;
 use App\Http\Controllers\Api\V1\Admin\Communication\TestimonialController;
+use App\Http\Controllers\Api\V1\Admin\Identity\ProfileController;
 use App\Http\Controllers\Api\V1\Admin\Identity\SocialLinkController;
 use App\Http\Controllers\Api\V1\Admin\Lab\ExperimentCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Lab\ExperimentController;
@@ -25,11 +26,13 @@ use App\Http\Controllers\Api\V1\Admin\Portfolio\CaseStudyController;
 use App\Http\Controllers\Api\V1\Admin\Portfolio\ProjectCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Portfolio\ProjectController;
 use App\Http\Controllers\Api\V1\Admin\Resume\ResumeController;
+use App\Http\Controllers\Api\V1\Admin\Resume\ResumeVersionController;
 use App\Http\Controllers\Api\V1\Admin\Seo\RedirectController;
 use App\Http\Controllers\Api\V1\Admin\Services\ServiceCategoryController;
 use App\Http\Controllers\Api\V1\Admin\Services\ServiceController;
 use App\Http\Controllers\Api\V1\Admin\Settings\NavigationItemController;
 use App\Http\Controllers\Api\V1\Admin\Settings\NavigationMenuController;
+use App\Http\Controllers\Api\V1\Admin\Settings\SiteSettingController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -95,6 +98,10 @@ $crud('page-sections', PageSectionController::class);
 $crud('navigation-menus', NavigationMenuController::class);
 $crud('navigation-items', NavigationItemController::class);
 $crud('social-links', SocialLinkController::class);
+Route::get('profile', [ProfileController::class, 'show'])->name('profile.show');
+Route::match(['put', 'patch'], 'profile', [ProfileController::class, 'update'])->name('profile.update');
+Route::get('settings', [SiteSettingController::class, 'index'])->name('settings.index');
+Route::patch('settings', [SiteSettingController::class, 'update'])->name('settings.update');
 
 // Médias, SEO, CV (D14, D15, D16)
 $crud('media-collections', MediaCollectionController::class);
@@ -102,3 +109,6 @@ $crud('media', MediaController::class);
 Route::get('media/{id}/file', [MediaController::class, 'file'])->whereNumber('id')->name('media.file');
 $crud('redirects', RedirectController::class);
 $crud('resumes', ResumeController::class);
+Route::post('resumes/{id}/versions', [ResumeVersionController::class, 'store'])->whereNumber('id')->name('resumes.versions.store');
+Route::patch('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'update'])->whereNumber(['id', 'versionId'])->name('resumes.versions.update');
+Route::delete('resumes/{id}/versions/{versionId}', [ResumeVersionController::class, 'destroy'])->whereNumber(['id', 'versionId'])->name('resumes.versions.destroy');

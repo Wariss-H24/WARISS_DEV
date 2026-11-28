@@ -6,6 +6,7 @@ use App\Enums\MediaKind;
 use App\Enums\MediaVisibility;
 use App\Http\Requests\Admin\AdminFormRequest;
 use App\Models\Media\Media;
+use App\Rules\AllowedUpload;
 use Closure;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\Rule;
@@ -74,7 +75,7 @@ class MediaRequest extends AdminFormRequest
     private function creationRules(): array
     {
         return [
-            'file' => ['required_without:external_url', 'prohibits:external_url', 'file', $this->allowedUpload(...)],
+            'file' => ['required_without:external_url', 'prohibits:external_url', 'file', new AllowedUpload],
             'external_url' => ['required_without:file', 'string', 'max:2048', 'url:https'],
             'kind' => ['required_with:external_url', Rule::enum(MediaKind::class)],
             'allow_duplicate' => ['sometimes', 'boolean'],
@@ -92,48 +93,6 @@ class MediaRequest extends AdminFormRequest
             'file' => ['prohibited'],
             'external_url' => $isExternal ? ['sometimes', 'required', 'string', 'max:2048', 'url:https'] : ['prohibited'],
         ];
-    }
-
-    /**
-     * Contrôle du fichier envoyé d'après son contenu.
-     */
-    private function allowedUpload(string $attribute, mixed $value, Closure $fail): void
-    {
-        if (! $value instanceof UploadedFile || ! $value->isValid()) {
-            return;
-        }
-
-        /** @var array<string, array{mimes: list<string>, kind: string, max_kb: int}> $types */
-        $types = config('wariss.uploads.types');
-        $type = $types[strtolower($value->getClientOriginalExtension())] ?? null;
-
-        if ($type === null) {
-            $fail(__('Ce type de fichier n\'est pas accepté. Formats acceptés : :formats.', ['formats' => implode(', ', array_keys($types))]));
-
-            return;
-        }
-
-        if (! in_array($value->getMimeType(), $type['mimes'], true)) {
-            $fail(__('Le contenu du fichier ne correspond pas à son extension.'));
-
-            return;
-        }
-
-        if ((int) $value->getSize() > $type['max_kb'] * 1024) {
-            $fail(__('Le fichier dépasse la taille maximale de :size Mo pour ce format.', ['size' => intdiv($type['max_kb'], 1024)]));
-
-            return;
-        }
-
-        if ($type['kind'] === MediaKind::Image->value) {
-            $dimensions = @getimagesize((string) $value->getRealPath());
-
-            if ($dimensions === false) {
-                $fail(__('L\'image est illisible ou corrompue.'));
-            } elseif ((int) config('wariss.uploads.max_image_pixels') < $dimensions[0] * $dimensions[1]) {
-                $fail(__('L\'image est trop grande : réduisez ses dimensions avant de l\'envoyer.'));
-            }
-        }
     }
 
     /**

@@ -42,6 +42,7 @@ use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
@@ -77,6 +78,16 @@ class AppServiceProvider extends ServiceProvider
         $this->configurePasswordPolicy();
         $this->configureMorphMap();
         $this->configureRateLimiting();
+        $this->configureGates();
+    }
+
+    /**
+     * Données sensibles (messages de contact, abonnés, journal d'activité, comptes, réglages non
+     * publics) : réservées au compte admin ; le compte viewer ne les voit jamais (D-04).
+     */
+    protected function configureGates(): void
+    {
+        Gate::define('view-sensitive-data', fn (User $user): bool => $user->isAdmin());
     }
 
     /**
