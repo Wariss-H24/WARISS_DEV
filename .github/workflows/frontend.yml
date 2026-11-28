@@ -39,6 +39,9 @@ jobs:
 
       - name: Installer pnpm
         uses: pnpm/action-setup@v4
+        with:
+          # Version lue dans le champ packageManager du frontend (pas de package.json à la racine).
+          package_json_file: frontend/package.json
 
       - name: Installer Node.js
         uses: actions/setup-node@v4
